@@ -47,7 +47,7 @@ jlink {
 
         if (org.gradle.internal.os.OperatingSystem.current().isWindows()) {
             print("Building for Windows")
-            icon = 'src/main/resources/app/icon.png'
+            icon = 'src/main/resources/app/icon.ico'
             installerType = 'exe'
             installerOptions = [
                     '--win-dir-chooser',
@@ -58,7 +58,7 @@ jlink {
 
         if (org.gradle.internal.os.OperatingSystem.current().isLinux()) {
             print("Building for Linux")
-            icon = 'src/main/resources/app/icon.ico'
+            icon = 'src/main/resources/app/icon.png'
             installerType = 'deb'
             installerOptions = [
                     '--linux-shortcut',
