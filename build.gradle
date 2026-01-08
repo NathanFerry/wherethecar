@@ -47,6 +47,8 @@ jlink {
         vendor = 'Groupe1 IL3'
         description = 'A JavaFX application to find where the car is.'
 
+        icon = 'src/main/zresources/app/icon.png'
+
         if (org.gradle.internal.os.OperatingSystem.current().isWindows()) {
             print("Building for Windows")
             installerOptions = [
