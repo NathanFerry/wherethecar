@@ -1,18 +1,33 @@
 plugins {
     id 'java'
     id 'org.openjfx.javafxplugin' version '0.1.0'
+    id 'idea'
+    id 'application'
 }
 
 group = 'groupe1.il3'
-version = '1.0-SNAPSHOT'
+version = '1.0.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
 }
 
+idea {
+    module {
+        downloadJavadoc = true
+        downloadSources = true
+    }
+}
+
+application {
+    mainClass = 'groupe1.il3.Main'
+
+    applicationDefaultJvmArgs = ["--enable-native-access=javafx.graphics"]
+}
+
 javafx {
     version = "25"
-    modules = [ 'javafx.controls' ]
+    modules = [ 'javafx.controls', 'javafx.fxml' ]
 }
 
 dependencies {
