@@ -44,7 +44,7 @@ jlink {
     jpackage {
         vendor = 'Groupe1 IL3'
         description = 'Vehicles management app'
-        icon = 'src/main/zresources/app/icon.png'
+        icon = 'src/main/resources/app/icon.png'
 
         if (org.gradle.internal.os.OperatingSystem.current().isWindows()) {
             print("Building for Windows")
