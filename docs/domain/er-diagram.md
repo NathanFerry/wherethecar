@@ -10,7 +10,7 @@ erDiagram
     AGENT ||--o{ RESERVATION : makes
     
     VEHICLE {
-        int id PK
+        uuid uuid PK
         string licensePlate
         string manufacturer
         string model
@@ -26,14 +26,14 @@ erDiagram
     }
     
     PICTURE {
-        int id PK
-        int vehicleId FK
+        uuid uuid PK
+        uuid vehicleUuid FK
         string name
     }
     
     MAINTENANCE_OPERATION {
-        int id PK
-        int vehicleId FK
+        uuid uuid PK
+        uuid vehicleUuid FK
         string name
         string description
         date date
@@ -41,13 +41,13 @@ erDiagram
     }
     
     MAINTENANCE_DOCUMENT {
-        int id PK
-        int operationId FK
+        uuid uuid PK
+        uuid operationUuid FK
         string name
     }
     
     AGENT {
-        int id PK
+        uuid uuid PK
         string firstName
         string lastName
         string email UK
@@ -56,9 +56,9 @@ erDiagram
     }
     
     RESERVATION {
-        int id PK
-        int agentId FK
-        int vehicleId FK
+        uuid uuid PK
+        uuid agentUuid FK
+        uuid vehicleUuid FK
         date startDate
         date endDate
         enum status "pending, confirmed, cancelled, completed"
