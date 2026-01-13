@@ -33,7 +33,7 @@ erDiagram
     
     MAINTENANCE_OPERATION {
         uuid uuid PK
-        uuid vehicleUuid FK
+        vehicle vehicle FK
         string name
         string description
         date date
@@ -56,8 +56,8 @@ erDiagram
     
     RESERVATION {
         uuid uuid PK
-        uuid agentUuid FK
-        uuid vehicleUuid FK
+        agent agent FK
+        agent vehicle FK
         date startDate
         date endDate
         enum status "pending, confirmed, cancelled, completed"
