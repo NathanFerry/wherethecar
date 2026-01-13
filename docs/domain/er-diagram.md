@@ -21,7 +21,7 @@ erDiagram
         int utilityWeight "kg"
         color color
         int kilometers
-        date acquisitionDate
+        datetime acquisitionDate
         enum status "available, reserved, maintenance"
     }
     
@@ -36,7 +36,7 @@ erDiagram
         vehicle vehicle FK
         string name
         string description
-        date date
+        datetime date
         decimal price
     }
     
@@ -58,8 +58,8 @@ erDiagram
         uuid uuid PK
         agent agent FK
         agent vehicle FK
-        date startDate
-        date endDate
+        datetime start
+        datetime end
         enum status "pending, confirmed, cancelled, completed"
     }
 ```

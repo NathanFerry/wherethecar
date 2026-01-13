@@ -59,8 +59,8 @@ Here you can find all the information about the domain layer of the WhereTheCar 
 - `id`: Unique identifier for the reservation.
 - `agentId`: Identifier of the agent making the reservation.
 - `vehicleId`: Identifier of the vehicle being reserved.
-- `startDate`: Start date of the reservation.
-- `endDate`: End date of the reservation.
+- `start`: Start date and time of the reservation.
+- `end`: End date and time of the reservation.
 - `status`:
   - pending
   - confirmed
