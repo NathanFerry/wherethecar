@@ -1,4 +1,4 @@
-package groupe1.il3;
+package groupe1.il3.app;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -10,7 +10,7 @@ import javafx.stage.Stage;
 public class App extends Application {
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) {
         Label label = new Label("Hello, World!");
 
         Scene root = new Scene(label, 400, 200);
