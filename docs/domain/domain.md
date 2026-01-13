@@ -23,10 +23,16 @@ Here you can find all the information about the domain layer of the WhereTheCar 
 - `kilometers`: Current distance traveled by the vehicle.
 - `acquisitionDate`: Date of the vehicle acquisition.
 - `maintenanceOperations`: List of maintenance operations performed on the vehicle.
+- `pictures`: List of pictures of the vehicle.
 - `status`: 
   - available
   - reserved
   - maintenance
+
+**Picture:**
+- `id`: Unique identifier for the picture.
+- `vehicleId`: Identifier of the vehicle associated with the picture.
+- `name`: Name of the picture.
 
 **MaintenanceOperation:**
 - `id`: Unique identifier for the maintenance operation.
@@ -40,7 +46,7 @@ Here you can find all the information about the domain layer of the WhereTheCar 
 **MaintenanceDocument:**
 - `id`: Unique identifier for the maintenance document.
 - `operationId`: Identifier of the maintenance operation associated with the document.
-- `fileName`: Name of the document file.
+- `name`: Name of the document.
 
 **Agent:**
 - `id`: Unique identifier for the user.
