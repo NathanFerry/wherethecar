@@ -19,7 +19,7 @@ erDiagram
         int seats
         int capacity "liters"
         int utilityWeight "kg"
-        string color
+        color color
         int kilometers
         date acquisitionDate
         enum status "available, reserved, maintenance"
@@ -51,7 +51,6 @@ erDiagram
         string firstName
         string lastName
         string email UK
-        string passwordHash
         boolean isAdmin
     }
     

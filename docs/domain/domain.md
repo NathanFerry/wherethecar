@@ -53,7 +53,6 @@ Here you can find all the information about the domain layer of the WhereTheCar 
 - `firstName`: First name of the user.
 - `lastName`: Last name of the user.
 - `email`: Email address of the user.
-- `passwordHash`: Hashed password for user authentication.
 - `isAdmin`: Boolean indicating if the user has administrative privileges.
 
 **Reservation:**
