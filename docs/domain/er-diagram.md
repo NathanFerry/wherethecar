@@ -37,7 +37,7 @@ erDiagram
         string name
         string description
         datetime date
-        decimal price
+        decimal cost
     }
     
     MAINTENANCE_DOCUMENT {

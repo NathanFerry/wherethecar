@@ -40,7 +40,7 @@ Here you can find all the information about the domain layer of the WhereTheCar 
 - `name`: Name of the maintenance operation.
 - `description`: Description of the maintenance operation.
 - `date`: Date when the maintenance operation was performed.
-- `price`: Cost of the maintenance operation.
+- `cost`: Cost of the maintenance operation.
 - `documents`: List of documents related to the maintenance operation.
 
 **MaintenanceDocument:**
