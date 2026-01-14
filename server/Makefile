@@ -1,31 +1,43 @@
-.PHONY: run stop clean logs restart clean-all
+.PHONY: help up down clean logs restart clean-all
 
-# Run the Docker Compose stack
-run:
+.DEFAULT_GOAL := help
+
+include .env
+include ./database/database.mk
+
+help:
+	@echo "Available commands:"
+	@echo "  make up         - Run the Docker Compose stack"
+	@echo "  make down       - Stop the containers"
+	@echo "  make clean      - Clean up containers and volumes"
+	@echo "  make clean-all  - Clean everything including images"
+	@echo "  make logs       - View logs"
+	@echo "  make restart    - Restart containers"
+	@echo "  make db-create  - Create the database"
+	@echo "  make db-drop    - Drop the database"
+	@echo "  make db-populate- Populate the database with initial data"
+	@echo "  make db-wype    - Wipe the database"
+
+up:
 	docker compose up -d
-	@echo "PostgreSQL container started on port 5432"
-	@echo "Database: wherethecar"
-	@echo "User: wherethecar"
-	@echo "Password: wherethecar"
+	@echo "PostgreSQL container started on port $(DATABASE_PORT)"
+	@echo "Database: $(DATABASE_NAME)"
+	@echo "User: $(DATABASE_USER)"
+	@echo "Password: $(DATABASE_PASSWORD)"
 
-# Stop the containers
-stop:
+down:
 	docker compose down
 
-# Clean up containers and volumes
 clean:
 	docker compose down -v
 	@echo "Containers and volumes removed"
 
-# Clean everything including images
 clean-all:
 	docker compose down -v --rmi all
 	@echo "Everything removed"
 
-# View logs
 logs:
 	docker compose logs -f
 
-# Restart containers
-restart: stop run
+restart: down up
 
