@@ -33,6 +33,7 @@ Here you can find all the information about the domain layer of the WhereTheCar 
 - `id`: Unique identifier for the picture.
 - `vehicleId`: Identifier of the vehicle associated with the picture.
 - `name`: Name of the picture.
+- `filePath`: File path where the picture is stored.
 
 **MaintenanceOperation:**
 - `id`: Unique identifier for the maintenance operation.
@@ -47,6 +48,7 @@ Here you can find all the information about the domain layer of the WhereTheCar 
 - `id`: Unique identifier for the maintenance document.
 - `operationId`: Identifier of the maintenance operation associated with the document.
 - `name`: Name of the document.
+- `filePath`: File path where the document is stored.
 
 **Agent:**
 - `id`: Unique identifier for the user.

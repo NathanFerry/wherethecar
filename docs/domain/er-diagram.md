@@ -29,6 +29,7 @@ erDiagram
         uuid uuid PK
         uuid vehicleUuid FK
         string name
+        string filePath
     }
     
     MAINTENANCE_OPERATION {
@@ -44,6 +45,7 @@ erDiagram
         uuid uuid PK
         uuid operationUuid FK
         string name
+        string filePath
     }
     
     AGENT {
