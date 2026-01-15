@@ -1,5 +1,6 @@
 package groupe1.il3.app.gui.mainframe;
 
+import groupe1.il3.app.gui.widgets.placeholders.PlaceHolderPane;
 import javafx.scene.Node;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
@@ -18,16 +19,8 @@ public class MainFrameBuilder implements Builder<Region> {
         BorderPane panel = new BorderPane();
 
         panel.setPrefSize(800, 600);
-        panel.setLeft(this.createTestColoredRegion(new Color(1,1,1,1)));
+        panel.setLeft(PlaceHolderPane.generate(Color.rgb(255,0,0), 100, 100));
 
         return panel;
-    }
-
-    //TODO add color attribute support
-    private Region createTestColoredRegion(Color color) {
-        Pane pane = new Pane();
-        pane.setPrefWidth(100);
-        pane.setStyle("-fx-background-color: #FF0000;");
-        return pane;
     }
 }
