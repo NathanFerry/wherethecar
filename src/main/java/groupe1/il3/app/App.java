@@ -1,5 +1,6 @@
 package groupe1.il3.app;
 
+import groupe1.il3.app.gui.mainframe.MainFrameController;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -11,9 +12,8 @@ public class App extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        Label label = new Label("Hello, World!");
 
-        Scene root = new Scene(label, 400, 200);
+        Scene root = new Scene(new MainFrameController().getView());
 
         primaryStage.setScene(root);
         primaryStage.setTitle("Hello World");
