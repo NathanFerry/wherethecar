@@ -1,16 +1,14 @@
 package groupe1.il3.app.gui.mainframe;
 
 import groupe1.il3.app.gui.widgets.placeholders.PlaceHolderPane;
-import javafx.scene.Node;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.util.Builder;
 
-public class MainFrameBuilder implements Builder<Region> {
+public class MainFrameViewBuilder implements Builder<Region> {
 
-    public MainFrameBuilder() {
+    public MainFrameViewBuilder() {
 
     }
 

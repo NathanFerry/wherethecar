@@ -8,7 +8,7 @@ public class MainFrameController {
     private final Builder<Region> viewBuilder;
 
     public MainFrameController() {
-        this.viewBuilder = new MainFrameBuilder();
+        this.viewBuilder = new MainFrameViewBuilder();
     }
 
     public Region getView() {
