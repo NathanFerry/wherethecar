@@ -7,6 +7,7 @@ public class AgentDto {
     private final String firstName;
     private final String lastName;
     private final String email;
+    private final String passwordHash;
     private final Boolean isAdmin;
 
     public AgentDto(
@@ -14,12 +15,14 @@ public class AgentDto {
         String firstName,
         String lastName,
         String email,
+        String passwordHash,
         Boolean isAdmin
     ) {
         this.uuid = uuid;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
+        this.passwordHash = passwordHash;
         this.isAdmin = isAdmin;
     }
 
@@ -37,6 +40,10 @@ public class AgentDto {
 
     public String getEmail() {
         return email;
+    }
+
+    public String getPasswordHash() {
+        return passwordHash;
     }
 
     public Boolean getIsAdmin() {

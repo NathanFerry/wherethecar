@@ -7,19 +7,22 @@ public final class Agent {
     private final String firstname;
     private final String lastname;
     private final String email;
+    private final String passwordHash;
     private final boolean isAdmin;
 
     public Agent(
-            UUID uuid,
-            String firstname,
-            String lastname,
-            String email,
-            boolean isAdmin
+        UUID uuid,
+        String firstname,
+        String lastname,
+        String email,
+        String passwordHash,
+        boolean isAdmin
     ) {
         this.uuid = uuid;
         this.firstname = firstname;
         this.lastname = lastname;
         this.email = email;
+        this.passwordHash = passwordHash;
         this.isAdmin = isAdmin;
     }
 
@@ -37,6 +40,10 @@ public final class Agent {
 
     public String getEmail() {
         return email;
+    }
+
+    public String getPasswordHash() {
+        return passwordHash;
     }
 
     public boolean isAdmin() {
