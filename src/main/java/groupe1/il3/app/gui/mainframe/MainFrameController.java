@@ -6,12 +6,16 @@ import javafx.util.Builder;
 public class MainFrameController {
 
     private final Builder<Region> viewBuilder;
+    private final MainFrameModel model;
 
     public MainFrameController() {
-        this.viewBuilder = new MainFrameViewBuilder();
+        this.model = new MainFrameModel();
+        this.viewBuilder = new MainFrameViewBuilder(this.model);
     }
 
     public Region getView() {
         return this.viewBuilder.build();
     }
+
+
 }
