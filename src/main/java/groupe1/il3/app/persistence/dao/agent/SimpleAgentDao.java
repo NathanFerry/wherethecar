@@ -45,6 +45,30 @@ public class SimpleAgentDao implements AgentDao {
     }
 
     @Override
+    public AgentDto getAgentByEmail(String email) {
+        String query = "SELECT uuid, firstname, lastname, email, password_hash, is_admin " +
+                       "FROM agent WHERE email = ?";
+
+        try (Connection conn = connectionManager.getNewConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setString(1, email);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return mapResultSetToAgentDto(rs);
+                }
+                return null;
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to retrieve agent with email: " + email, e);
+        } catch (DatabaseException e) {
+            throw new RuntimeException("Database connection error while retrieving agent", e);
+        }
+    }
+
+    @Override
     public List<AgentDto> getAllAgents() {
         String query = "SELECT uuid, firstname, lastname, email, password_hash, is_admin " +
                        "FROM agent";

@@ -7,5 +7,6 @@ import java.util.UUID;
 
 public interface AgentDao {
     public AgentDto getAgentById(UUID uuid);
+    public AgentDto getAgentByEmail(String email);
     public List<AgentDto> getAllAgents();
 }

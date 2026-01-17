@@ -1,10 +1,10 @@
 INSERT INTO agent (uuid, firstname, lastname, email, password_hash, is_admin) VALUES
-    ('a1b2c3d4-e5f6-7890-abcd-ef1234567890', 'John', 'Smith', 'john.smith@wherethecar.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', true),
-    ('b2c3d4e5-f6a7-8901-bcde-f12345678901', 'Sarah', 'Johnson', 'sarah.johnson@wherethecar.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', false),
-    ('c3d4e5f6-a7b8-9012-cdef-123456789012', 'Michael', 'Brown', 'michael.brown@wherethecar.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', false),
-    ('d4e5f6a7-b8c9-0123-def1-234567890123', 'Emily', 'Davis', 'emily.davis@wherethecar.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', false),
-    ('e5f6a7b8-c9d0-1234-ef12-345678901234', 'David', 'Martinez', 'david.martinez@wherethecar.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', false),
-    ('f6a7b8c9-d0e1-2345-f123-456789012345', 'Jessica', 'Garcia', 'jessica.garcia@wherethecar.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', true);
+    ('a1b2c3d4-e5f6-7890-abcd-ef1234567890', 'John', 'Smith', 'john.smith@wherethecar.com', '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918', true),
+    ('b2c3d4e5-f6a7-8901-bcde-f12345678901', 'Sarah', 'Johnson', 'sarah.johnson@wherethecar.com', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8', false),
+    ('c3d4e5f6-a7b8-9012-cdef-123456789012', 'Michael', 'Brown', 'michael.brown@wherethecar.com', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8', false),
+    ('d4e5f6a7-b8c9-0123-def1-234567890123', 'Emily', 'Davis', 'emily.davis@wherethecar.com', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8', false),
+    ('e5f6a7b8-c9d0-1234-ef12-345678901234', 'David', 'Martinez', 'david.martinez@wherethecar.com', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8', false),
+    ('f6a7b8c9-d0e1-2345-f123-456789012345', 'Jessica', 'Garcia', 'jessica.garcia@wherethecar.com', '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918', true);
 
 INSERT INTO vehicle (uuid, license_plate, manufacturer, model, energy, power, seats, capacity, utility_weight, color, kilometers, acquisition_date, status) VALUES
     ('11111111-1111-1111-1111-111111111111', 'ABC-123', 'Toyota', 'Corolla', 'gasoline', 132, 5, 470, 1200, 'white', 45000, '2022-03-15 10:00:00', 'available'),

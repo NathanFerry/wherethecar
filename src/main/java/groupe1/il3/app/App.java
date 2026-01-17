@@ -1,22 +1,45 @@
 package groupe1.il3.app;
 
+import groupe1.il3.app.gui.login.LoginController;
 import groupe1.il3.app.gui.mainframe.MainFrameController;
 import javafx.application.Application;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
 import javafx.stage.Stage;
 
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 public class App extends Application {
+
+    private Stage primaryStage;
 
     @Override
     public void start(Stage primaryStage) {
+        this.primaryStage = primaryStage;
 
-        Scene root = new Scene(new MainFrameController().getView());
+        // Show login screen
+        showLoginScreen();
 
-        primaryStage.setScene(root);
-        primaryStage.setTitle("Hello World");
+        primaryStage.setTitle("WhereTheCar");
         primaryStage.show();
+    }
+
+    /**
+     * Displays the login screen.
+     */
+    private void showLoginScreen() {
+        LoginController loginController = new LoginController(agent -> {
+            // On successful login, show the main frame
+            showMainFrame();
+        });
+
+        Scene loginScene = new Scene(loginController.getView());
+        primaryStage.setScene(loginScene);
+    }
+
+    /**
+     * Displays the main application frame.
+     */
+    private void showMainFrame() {
+        MainFrameController mainFrameController = new MainFrameController();
+        Scene mainScene = new Scene(mainFrameController.getView());
+        primaryStage.setScene(mainScene);
     }
 }
