@@ -17,7 +17,7 @@ public class Vehicle {
     private int seats;
     private int capacity;
     private int utilityWeight;
-    private Color color;
+    private String color;
     private int kilometers;
     private LocalDateTime acquisitionDate;
     private Status status;
@@ -32,7 +32,7 @@ public class Vehicle {
         int seats,
         int capacity,
         int utilityWeight,
-        Color color,
+        String color,
         int kilometers,
         LocalDateTime acquisitionDate,
         Status status
