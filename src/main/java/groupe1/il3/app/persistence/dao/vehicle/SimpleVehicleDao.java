@@ -72,6 +72,26 @@ public class SimpleVehicleDao implements VehicleDao {
         }
     }
 
+    @Override
+    public void updateVehicleStatus(UUID vehicleUuid, String status) {
+        String query = "UPDATE vehicle SET status = ?::vehicle_status WHERE uuid = ?";
+
+        try {
+            Connection conn = connectionManager.getNewConnection();
+            PreparedStatement stmt = conn.prepareStatement(query);
+
+            stmt.setString(1, status);
+            stmt.setObject(2, vehicleUuid);
+
+            stmt.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to update vehicle status for UUID: " + vehicleUuid, e);
+        } catch (DatabaseException e) {
+            throw new RuntimeException("Database connection error while updating vehicle status", e);
+        }
+    }
+
     private VehicleDto mapResultSetToVehicleDto(ResultSet rs) throws SQLException {
         UUID uuid = (UUID) rs.getObject("uuid");
         String licensePlate = rs.getString("license_plate");

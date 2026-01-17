@@ -1,5 +1,6 @@
 package groupe1.il3.app.gui.mainframe;
 
+import groupe1.il3.app.gui.reservations.ReservationsController;
 import groupe1.il3.app.gui.vehicleselector.VehicleSelectorController;
 import javafx.scene.layout.Region;
 import javafx.util.Builder;
@@ -24,9 +25,8 @@ public class MainFrameController {
     }
 
     public void showReservations() {
-        // TODO: Implement reservations view
-        javafx.scene.control.Label placeholder = new javafx.scene.control.Label("Mes réservations - À implémenter");
-        model.setCenterContent(placeholder);
+        ReservationsController reservationsController = new ReservationsController();
+        model.setCenterContent(reservationsController.getView());
     }
 }
 

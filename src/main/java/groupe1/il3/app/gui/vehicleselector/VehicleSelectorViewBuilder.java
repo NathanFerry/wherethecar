@@ -7,15 +7,20 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.util.Builder;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
 public class VehicleSelectorViewBuilder implements Builder<Region> {
     private final VehicleSelectorModel model;
     private final Runnable loadVehiclesAction;
+    private final Runnable reserveVehicleAction;
 
-    public VehicleSelectorViewBuilder(VehicleSelectorModel model, Runnable loadVehiclesAction) {
+    public VehicleSelectorViewBuilder(VehicleSelectorModel model, Runnable loadVehiclesAction, Runnable reserveVehicleAction) {
         this.model = model;
         this.loadVehiclesAction = loadVehiclesAction;
+        this.reserveVehicleAction = reserveVehicleAction;
     }
 
     @Override
@@ -23,22 +28,22 @@ public class VehicleSelectorViewBuilder implements Builder<Region> {
         BorderPane mainPane = new BorderPane();
         mainPane.setPadding(new Insets(10));
 
-        // Left side: List of vehicles
         mainPane.setLeft(createVehicleListPane());
 
-        // Right side: Vehicle details
         mainPane.setCenter(createVehicleDetailsPane());
 
-        // Load vehicles on initialization
         loadVehiclesAction.run();
 
         return mainPane;
     }
 
     private Region createVehicleListPane() {
-        VBox listPane = new VBox();
+        VBox listPane = new VBox(10);
+        listPane.setPadding(new Insets(10));
+        listPane.setPrefWidth(350);
 
         Label title = new Label("Liste des Véhicules");
+        title.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
 
         ListView<Vehicle> vehicleListView = new ListView<>();
         vehicleListView.setItems(model.getVehicles());
@@ -88,7 +93,25 @@ public class VehicleSelectorViewBuilder implements Builder<Region> {
         detailsGrid.setVgap(10);
         detailsGrid.setPadding(new Insets(10));
 
-        // Create labels that update with selected vehicle
+        Button reserveButton = new Button("Réserver ce véhicule");
+        reserveButton.setOnAction(e -> showReservationDialog());
+        reserveButton.setMaxWidth(Double.MAX_VALUE);
+
+        // Only enable reserve button if vehicle is available
+        reserveButton.disableProperty().bind(
+            model.selectedVehicleProperty().isNull().or(
+                model.selectedVehicleProperty().isNotNull().and(
+                    javafx.beans.binding.Bindings.createBooleanBinding(
+                        () -> {
+                            Vehicle v = model.getSelectedVehicle();
+                            return v != null && !"AVAILABLE".equals(v.getStatus().toString());
+                        },
+                        model.selectedVehicleProperty()
+                    )
+                )
+            )
+        );
+
         model.selectedVehicleProperty().addListener((obs, oldVal, newVal) -> {
             detailsGrid.getChildren().clear();
             if (newVal != null) {
@@ -111,7 +134,7 @@ public class VehicleSelectorViewBuilder implements Builder<Region> {
             }
         });
 
-        detailsBox.getChildren().addAll(titleLabel, new Separator(), detailsGrid);
+        detailsBox.getChildren().addAll(titleLabel, new Separator(), detailsGrid, reserveButton);
 
         return detailsBox;
     }
@@ -145,7 +168,92 @@ public class VehicleSelectorViewBuilder implements Builder<Region> {
         };
     }
 
-    // Custom ListCell for displaying vehicles
+    private void showReservationDialog() {
+        Dialog<ButtonType> dialog = new Dialog<>();
+        dialog.setTitle("Réserver un véhicule");
+        dialog.setHeaderText("Réservation de " + model.getSelectedVehicle().getManufacturer() + " " + model.getSelectedVehicle().getModel());
+
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(20));
+
+        Label startDateLabel = new Label("Date de début:");
+        DatePicker startDatePicker = new DatePicker(LocalDate.now());
+
+        Label startTimeLabel = new Label("Heure de début:");
+        TextField startTimeField = new TextField("09:00");
+
+        Label endDateLabel = new Label("Date de fin:");
+        DatePicker endDatePicker = new DatePicker(LocalDate.now().plusDays(1));
+
+        Label endTimeLabel = new Label("Heure de fin:");
+        TextField endTimeField = new TextField("17:00");
+
+        Label errorLabel = new Label();
+        errorLabel.textProperty().bind(model.reservationErrorMessageProperty());
+        errorLabel.setWrapText(true);
+        errorLabel.setMaxWidth(300);
+
+        grid.add(startDateLabel, 0, 0);
+        grid.add(startDatePicker, 1, 0);
+        grid.add(startTimeLabel, 0, 1);
+        grid.add(startTimeField, 1, 1);
+
+        grid.add(new Label(), 0, 2); // Spacer
+
+        grid.add(endDateLabel, 0, 3);
+        grid.add(endDatePicker, 1, 3);
+        grid.add(endTimeLabel, 0, 4);
+        grid.add(endTimeField, 1, 4);
+
+        grid.add(errorLabel, 0, 5, 2, 1);
+
+        dialog.getDialogPane().setContent(grid);
+
+        ButtonType reserveButtonType = new ButtonType("Réserver", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(reserveButtonType, ButtonType.CANCEL);
+
+        dialog.showAndWait().ifPresent(response -> {
+            if (response == reserveButtonType) {
+                try {
+                    LocalDate startDate = startDatePicker.getValue();
+                    LocalTime startTime = LocalTime.parse(startTimeField.getText());
+                    LocalDateTime startDateTime = LocalDateTime.of(startDate, startTime);
+
+                    LocalDate endDate = endDatePicker.getValue();
+                    LocalTime endTime = LocalTime.parse(endTimeField.getText());
+                    LocalDateTime endDateTime = LocalDateTime.of(endDate, endTime);
+
+                    model.setReservationStartDate(startDateTime);
+                    model.setReservationEndDate(endDateTime);
+
+                    reserveVehicleAction.run();
+
+                    if (model.getReservationErrorMessage().isEmpty()) {
+                        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                        alert.setTitle("Réservation confirmée");
+                        alert.setHeaderText(null);
+                        alert.setContentText("Votre réservation a été créée avec succès!");
+                        alert.showAndWait();
+                    } else {
+                        Alert alert = new Alert(Alert.AlertType.ERROR);
+                        alert.setTitle("Erreur de réservation");
+                        alert.setHeaderText(null);
+                        alert.setContentText(model.getReservationErrorMessage());
+                        alert.showAndWait();
+                    }
+                } catch (Exception e) {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Erreur");
+                    alert.setHeaderText(null);
+                    alert.setContentText("Format de date/heure invalide. Utilisez HH:mm pour l'heure (ex: 09:00)");
+                    alert.showAndWait();
+                }
+            }
+        });
+    }
+
     private static class VehicleListCell extends ListCell<Vehicle> {
         @Override
         protected void updateItem(Vehicle vehicle, boolean empty) {

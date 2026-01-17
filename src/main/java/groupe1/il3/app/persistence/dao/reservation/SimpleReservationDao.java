@@ -70,6 +70,32 @@ public class SimpleReservationDao implements ReservationDao {
         }
     }
 
+    @Override
+    public List<ReservationDto> getReservationsByAgentUuid(UUID agentUuid) {
+        String query = "SELECT uuid, agent_uuid, vehicle_uuid, start_date, end_date, status " +
+                       "FROM reservation WHERE agent_uuid = ? ORDER BY start_date DESC";
+
+        List<ReservationDto> reservations = new ArrayList<>();
+
+        try (Connection conn = connectionManager.getNewConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setObject(1, agentUuid);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    reservations.add(mapResultSetToReservationDto(rs));
+                }
+                return reservations;
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to retrieve reservations for agent: " + agentUuid, e);
+        } catch (DatabaseException e) {
+            throw new RuntimeException("Database connection error while retrieving agent reservations", e);
+        }
+    }
+
     private ReservationDto mapResultSetToReservationDto(ResultSet rs) throws SQLException {
         UUID uuid = (UUID) rs.getObject("uuid");
         UUID agentUuid = (UUID) rs.getObject("agent_uuid");
@@ -88,5 +114,29 @@ public class SimpleReservationDao implements ReservationDao {
             end,
             status
         );
+    }
+
+    @Override
+    public void createReservation(UUID uuid, UUID agentUuid, UUID vehicleUuid, LocalDateTime startDate, LocalDateTime endDate, String status) {
+        String query = "INSERT INTO reservation (uuid, agent_uuid, vehicle_uuid, start_date, end_date, status) " +
+                       "VALUES (?, ?, ?, ?, ?, ?::reservation_status)";
+
+        try (Connection conn = connectionManager.getNewConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setObject(1, uuid);
+            stmt.setObject(2, agentUuid);
+            stmt.setObject(3, vehicleUuid);
+            stmt.setTimestamp(4, Timestamp.valueOf(startDate));
+            stmt.setTimestamp(5, Timestamp.valueOf(endDate));
+            stmt.setString(6, status);
+
+            stmt.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to create reservation", e);
+        } catch (DatabaseException e) {
+            throw new RuntimeException("Database connection error while creating reservation", e);
+        }
     }
 }

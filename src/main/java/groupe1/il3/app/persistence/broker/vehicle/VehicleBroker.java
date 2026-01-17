@@ -6,7 +6,6 @@ import groupe1.il3.app.domain.vehicle.Vehicle;
 import groupe1.il3.app.persistence.dao.vehicle.SimpleVehicleDao;
 import groupe1.il3.app.persistence.dao.vehicle.VehicleDao;
 import groupe1.il3.app.persistence.dto.vehicle.VehicleDto;
-import javafx.scene.paint.Color;
 
 import java.util.List;
 import java.util.UUID;
@@ -28,6 +27,10 @@ public class VehicleBroker {
         return vehicleDao.getAllVehicles().stream()
                 .map(this::convertToVehicle)
                 .collect(Collectors.toList());
+    }
+
+    public void updateVehicleStatus(UUID vehicleUuid, Status status) {
+        vehicleDao.updateVehicleStatus(vehicleUuid, status.toString().toLowerCase());
     }
 
     private Vehicle convertToVehicle(VehicleDto dto) {

@@ -8,4 +8,5 @@ import java.util.UUID;
 public interface VehicleDao {
     public VehicleDto getVehicleById(UUID uuid);
     public List<VehicleDto> getAllVehicles();
+    public void updateVehicleStatus(UUID vehicleUuid, String status);
 }

@@ -26,4 +26,24 @@ public class Reservation {
         this.startDate = startDate;
         this.endDate = endDate;
     }
+
+    public UUID getUuid() {
+        return uuid;
+    }
+
+    public Agent getAgent() {
+        return agent;
+    }
+
+    public Vehicle getVehicle() {
+        return vehicle;
+    }
+
+    public LocalDateTime getStartDate() {
+        return startDate;
+    }
+
+    public LocalDateTime getEndDate() {
+        return endDate;
+    }
 }

@@ -1,4 +1,4 @@
-package groupe1.il3.app.util;
+package groupe1.il3.app.domain.authentication;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
