@@ -1,10 +1,6 @@
 package groupe1.il3.app.domain.vehicle;
 
-import javafx.scene.paint.Color;
-
-import java.text.DateFormat;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.UUID;
 
 public class Vehicle {
@@ -51,4 +47,58 @@ public class Vehicle {
         this.acquisitionDate = acquisitionDate;
         this.status = status;
     }
+
+    public UUID getUuid() {
+        return uuid;
+    }
+
+    public String getLicencePlate() {
+        return licencePlate;
+    }
+
+    public String getManufacturer() {
+        return manufacturer;
+    }
+
+    public String getModel() {
+        return model;
+    }
+
+    public Energy getEnergy() {
+        return energy;
+    }
+
+    public int getPower() {
+        return power;
+    }
+
+    public int getSeats() {
+        return seats;
+    }
+
+    public int getCapacity() {
+        return capacity;
+    }
+
+    public int getUtilityWeight() {
+        return utilityWeight;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public int getKilometers() {
+        return kilometers;
+    }
+
+    public LocalDateTime getAcquisitionDate() {
+        return acquisitionDate;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
 }
+
+
