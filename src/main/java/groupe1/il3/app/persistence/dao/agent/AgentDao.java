@@ -1,5 +1,11 @@
 package groupe1.il3.app.persistence.dao.agent;
 
-public interface AgentDao {
+import groupe1.il3.app.persistence.dto.agent.AgentDto;
 
+import java.util.List;
+import java.util.UUID;
+
+public interface AgentDao {
+    public AgentDto getAgentById(UUID uuid);
+    public List<AgentDto> getAllAgents();
 }
