@@ -9,4 +9,7 @@ public interface AgentDao {
     public AgentDto getAgentById(UUID uuid);
     public AgentDto getAgentByEmail(String email);
     public List<AgentDto> getAllAgents();
+    public void createAgent(AgentDto agentDto);
+    public void updateAgent(AgentDto agentDto);
+    public void deleteAgent(UUID agentUuid);
 }

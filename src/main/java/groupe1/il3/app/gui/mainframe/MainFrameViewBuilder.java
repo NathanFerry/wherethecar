@@ -1,5 +1,6 @@
 package groupe1.il3.app.gui.mainframe;
 
+import groupe1.il3.app.domain.authentication.SessionManager;
 import javafx.scene.control.Button;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Region;
@@ -11,11 +12,13 @@ public class MainFrameViewBuilder implements Builder<Region> {
     private final MainFrameModel model;
     private final Runnable showVehicleListAction;
     private final Runnable showReservationsAction;
+    private final Runnable showAdminPanelAction;
 
-    public MainFrameViewBuilder(MainFrameModel model, Runnable showVehicleListAction, Runnable showReservationsAction) {
+    public MainFrameViewBuilder(MainFrameModel model, Runnable showVehicleListAction, Runnable showReservationsAction, Runnable showAdminPanelAction) {
         this.model = model;
         this.showVehicleListAction = showVehicleListAction;
         this.showReservationsAction = showReservationsAction;
+        this.showAdminPanelAction = showAdminPanelAction;
     }
 
     @Override
@@ -46,7 +49,15 @@ public class MainFrameViewBuilder implements Builder<Region> {
         Button reservationsBtn = this.navigationButton("Mes réservations");
         reservationsBtn.setOnAction(e -> showReservationsAction.run());
 
-        navPanel.getChildren().addAll(vehiclesBtn, reservationsBtn);
+        Button adminBtn = this.navigationButton("Administration");
+        adminBtn.setOnAction(e -> showAdminPanelAction.run());
+
+        boolean isAdmin = SessionManager.getInstance().getCurrentAgent() != null &&
+                         SessionManager.getInstance().getCurrentAgent().isAdmin();
+        adminBtn.setVisible(isAdmin);
+        adminBtn.setManaged(isAdmin);
+
+        navPanel.getChildren().addAll(vehiclesBtn, reservationsBtn, adminBtn);
 
         return navPanel;
     }

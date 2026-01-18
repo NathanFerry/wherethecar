@@ -33,6 +33,48 @@ public class VehicleBroker {
         vehicleDao.updateVehicleStatus(vehicleUuid, status.toString().toLowerCase());
     }
 
+    public void createVehicle(Vehicle vehicle) {
+        VehicleDto dto = new VehicleDto(
+            vehicle.getUuid(),
+            vehicle.getLicencePlate(),
+            vehicle.getManufacturer(),
+            vehicle.getModel(),
+            vehicle.getEnergy().toString().toLowerCase(),
+            vehicle.getPower(),
+            vehicle.getSeats(),
+            vehicle.getCapacity(),
+            vehicle.getUtilityWeight(),
+            vehicle.getColor(),
+            vehicle.getKilometers(),
+            vehicle.getAcquisitionDate(),
+            vehicle.getStatus().toString().toLowerCase()
+        );
+        vehicleDao.createVehicle(dto);
+    }
+
+    public void updateVehicle(Vehicle vehicle) {
+        VehicleDto dto = new VehicleDto(
+            vehicle.getUuid(),
+            vehicle.getLicencePlate(),
+            vehicle.getManufacturer(),
+            vehicle.getModel(),
+            vehicle.getEnergy().toString().toLowerCase(),
+            vehicle.getPower(),
+            vehicle.getSeats(),
+            vehicle.getCapacity(),
+            vehicle.getUtilityWeight(),
+            vehicle.getColor(),
+            vehicle.getKilometers(),
+            vehicle.getAcquisitionDate(),
+            vehicle.getStatus().toString().toLowerCase()
+        );
+        vehicleDao.updateVehicle(dto);
+    }
+
+    public void deleteVehicle(UUID vehicleUuid) {
+        vehicleDao.deleteVehicle(vehicleUuid);
+    }
+
     private Vehicle convertToVehicle(VehicleDto dto) {
         return new Vehicle(
                 dto.getUuid(),
