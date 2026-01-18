@@ -44,6 +44,11 @@ jlink {
         name = 'Wherethecar'
     }
 
+    mergedModule {
+        requires 'java.sql'
+        requires 'java.naming'
+    }
+
     addExtraDependencies("java.sql")
     forceMerge 'postgresql'
 
