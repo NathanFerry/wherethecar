@@ -14,7 +14,26 @@ services:
       - wherethecar-db-data:/var/lib/postgresql/data
     restart: unless-stopped
 
+  file-api:
+    build:
+      context: ./file-api
+      dockerfile: Dockerfile
+    container_name: wherethecar-file-api
+    environment:
+      FILE_API_HOST: 0.0.0.0
+      FILE_API_PORT: 8080
+      PDF_STORAGE_PATH: /app/storage/pdf
+      PICTURE_STORAGE_PATH: /app/storage/pictures
+      RUST_LOG: info
+    ports:
+      - "8080:8080"
+    volumes:
+      - wherethecar-file-storage:/app/storage
+    restart: unless-stopped
+
 volumes:
   wherethecar-db-data:
+    driver: local
+  wherethecar-file-storage:
     driver: local
 
