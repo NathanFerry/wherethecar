@@ -27,6 +27,12 @@ application {
     applicationDefaultJvmArgs = ["--enable-native-access=javafx.graphics"]
 }
 
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+}
+
 javafx {
     version = "25"
     modules = [ 'javafx.controls', 'javafx.fxml' ]
@@ -42,7 +48,8 @@ jlink {
     forceMerge 'postgresql'
 
     // Defining the JAVA_HOME path here is a BAD PRACTICE.
-    javaHome = System.getenv("JAVA_HOME") ?: "/usr/lib/jvm/java-25-openjdk-amd64"
+    //javaHome = System.getenv("JAVA_HOME") ?: "/usr/lib/jvm/java-25-openjdk-amd64"
+    javaHome = javaToolchains.compilerFor(java.toolchain).get().metadata.installationPath.asFile.absolutePath
 
     jpackage {
         vendor = 'Groupe1 IL3'
