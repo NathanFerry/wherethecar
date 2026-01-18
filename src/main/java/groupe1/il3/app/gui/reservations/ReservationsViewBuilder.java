@@ -12,10 +12,12 @@ import java.time.format.DateTimeFormatter;
 public class ReservationsViewBuilder implements Builder<Region> {
     private final ReservationsModel model;
     private final Runnable loadReservationsAction;
+    private final Runnable returnVehicleAction;
 
-    public ReservationsViewBuilder(ReservationsModel model, Runnable loadReservationsAction) {
+    public ReservationsViewBuilder(ReservationsModel model, Runnable loadReservationsAction, Runnable returnVehicleAction) {
         this.model = model;
         this.loadReservationsAction = loadReservationsAction;
+        this.returnVehicleAction = returnVehicleAction;
     }
 
     @Override
@@ -91,6 +93,8 @@ public class ReservationsViewBuilder implements Builder<Region> {
         detailsGrid.setVgap(10);
         detailsGrid.setPadding(new Insets(10));
 
+        VBox returnVehicleBox = createReturnVehicleBox();
+
         model.selectedReservationProperty().addListener((obs, oldVal, newVal) -> {
             detailsGrid.getChildren().clear();
             if (newVal != null) {
@@ -134,9 +138,86 @@ public class ReservationsViewBuilder implements Builder<Region> {
             }
         });
 
-        detailsBox.getChildren().addAll(titleLabel, new Separator(), detailsGrid);
+        detailsBox.getChildren().addAll(titleLabel, new Separator(), detailsGrid, new Separator(), returnVehicleBox);
 
         return detailsBox;
+    }
+
+    private VBox createReturnVehicleBox() {
+        VBox returnBox = new VBox(10);
+        returnBox.setPadding(new Insets(10));
+
+        Label sectionTitle = new Label("Retour du véhicule");
+        sectionTitle.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+
+        HBox kilometersBox = new HBox(10);
+        kilometersBox.setAlignment(Pos.CENTER_LEFT);
+
+        Label currentKilometersLabel = new Label();
+        currentKilometersLabel.setStyle("-fx-font-weight: bold;");
+
+        Label newKilometersLabel = new Label("Nouveau kilométrage:");
+        TextField newKilometersField = new TextField();
+        newKilometersField.setPromptText("Entrez le nouveau kilométrage");
+        newKilometersField.setPrefWidth(200);
+
+        newKilometersField.textProperty().addListener((obs, oldVal, newVal) -> {
+            if (!newVal.matches("\\d*")) {
+                newKilometersField.setText(oldVal);
+            } else if (!newVal.isEmpty()) {
+                try {
+                    model.setNewKilometers(Integer.parseInt(newVal));
+                } catch (NumberFormatException e) {
+                    // Ignore invalid input
+                }
+            }
+        });
+
+        kilometersBox.getChildren().addAll(currentKilometersLabel, newKilometersLabel, newKilometersField);
+
+        Button returnButton = new Button("Retourner le véhicule");
+        returnButton.setOnAction(e -> {
+            Alert confirmDialog = new Alert(Alert.AlertType.CONFIRMATION);
+            confirmDialog.setTitle("Confirmer le retour");
+            confirmDialog.setHeaderText("Retour du véhicule");
+            confirmDialog.setContentText("Êtes-vous sûr de vouloir retourner ce véhicule ?");
+
+            confirmDialog.showAndWait().ifPresent(response -> {
+                if (response == ButtonType.OK) {
+                    returnVehicleAction.run();
+
+                    if (model.getReturnErrorMessage().isEmpty()) {
+                        Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
+                        successAlert.setTitle("Retour confirmé");
+                        successAlert.setHeaderText("Véhicule retourné avec succès");
+                        successAlert.setContentText("Le véhicule a été retourné et le kilométrage a été mis à jour.");
+                        successAlert.showAndWait();
+                    }
+                }
+            });
+        });
+
+        Label errorLabel = new Label();
+        errorLabel.setStyle("-fx-text-fill: red;");
+        errorLabel.textProperty().bind(model.returnErrorMessageProperty());
+        errorLabel.visibleProperty().bind(model.returnErrorMessageProperty().isNotEmpty());
+
+        model.selectedReservationProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null && newVal.getVehicle() != null) {
+                int currentKm = newVal.getVehicle().getKilometers();
+                currentKilometersLabel.setText("Kilométrage actuel: " + currentKm + " km");
+                newKilometersField.setText(String.valueOf(currentKm));
+                returnBox.setVisible(true);
+            } else {
+                returnBox.setVisible(false);
+            }
+            model.setReturnErrorMessage("");
+        });
+
+        returnBox.getChildren().addAll(sectionTitle, kilometersBox, returnButton, errorLabel);
+        returnBox.setVisible(false);
+
+        return returnBox;
     }
 
     private void addSectionHeader(GridPane grid, int row, String title) {

@@ -50,6 +50,30 @@ public class ReservationBroker {
         vehicleBroker.updateVehicleStatus(vehicleUuid, Status.RESERVED);
     }
 
+    public void returnVehicle(UUID reservationUuid, UUID vehicleUuid, int newKilometers) {
+        reservationDao.updateReservationStatus(reservationUuid, "completed");
+
+        Vehicle vehicle = vehicleBroker.getVehicleById(vehicleUuid);
+        if (vehicle != null) {
+            Vehicle updatedVehicle = new Vehicle(
+                vehicle.getUuid(),
+                vehicle.getLicencePlate(),
+                vehicle.getManufacturer(),
+                vehicle.getModel(),
+                vehicle.getEnergy(),
+                vehicle.getPower(),
+                vehicle.getSeats(),
+                vehicle.getCapacity(),
+                vehicle.getUtilityWeight(),
+                vehicle.getColor(),
+                newKilometers,
+                vehicle.getAcquisitionDate(),
+                Status.AVAILABLE
+            );
+            vehicleBroker.updateVehicle(updatedVehicle);
+        }
+    }
+
     private Reservation convertToReservation(ReservationDto dto) {
         Agent agent = agentBroker.getAgentById(dto.getAgentUuid());
         Vehicle vehicle = vehicleBroker.getVehicleById(dto.getVehicleUuid());

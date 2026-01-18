@@ -27,8 +27,10 @@ public class SimpleReservationDao implements ReservationDao {
         String query = "SELECT uuid, agent_uuid, vehicle_uuid, start_date, end_date, status " +
                        "FROM reservation WHERE uuid = ?";
 
-        try (Connection conn = connectionManager.getNewConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+        try {
+
+            Connection conn = connectionManager.getNewConnection();
+            PreparedStatement stmt = conn.prepareStatement(query);
 
             stmt.setObject(1, uuid);
 
@@ -53,9 +55,11 @@ public class SimpleReservationDao implements ReservationDao {
 
         List<ReservationDto> reservations = new ArrayList<>();
 
-        try (Connection conn = connectionManager.getNewConnection();
-             PreparedStatement stmt = conn.prepareStatement(query);
-             ResultSet rs = stmt.executeQuery()) {
+        try {
+
+            Connection conn = connectionManager.getNewConnection();
+            PreparedStatement stmt = conn.prepareStatement(query);
+            ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
                 reservations.add(mapResultSetToReservationDto(rs));
@@ -73,12 +77,15 @@ public class SimpleReservationDao implements ReservationDao {
     @Override
     public List<ReservationDto> getReservationsByAgentUuid(UUID agentUuid) {
         String query = "SELECT uuid, agent_uuid, vehicle_uuid, start_date, end_date, status " +
-                       "FROM reservation WHERE agent_uuid = ? ORDER BY start_date DESC";
+                       "FROM reservation WHERE agent_uuid = ? AND status NOT IN ('completed', 'cancelled') " +
+                       "ORDER BY start_date ASC";
 
         List<ReservationDto> reservations = new ArrayList<>();
 
-        try (Connection conn = connectionManager.getNewConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+        try {
+
+            Connection conn = connectionManager.getNewConnection();
+            PreparedStatement stmt = conn.prepareStatement(query);
 
             stmt.setObject(1, agentUuid);
 
@@ -121,8 +128,10 @@ public class SimpleReservationDao implements ReservationDao {
         String query = "INSERT INTO reservation (uuid, agent_uuid, vehicle_uuid, start_date, end_date, status) " +
                        "VALUES (?, ?, ?, ?, ?, ?::reservation_status)";
 
-        try (Connection conn = connectionManager.getNewConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+        try {
+
+            Connection conn = connectionManager.getNewConnection();
+            PreparedStatement stmt = conn.prepareStatement(query);
 
             stmt.setObject(1, uuid);
             stmt.setObject(2, agentUuid);
@@ -137,6 +146,27 @@ public class SimpleReservationDao implements ReservationDao {
             throw new RuntimeException("Failed to create reservation", e);
         } catch (DatabaseException e) {
             throw new RuntimeException("Database connection error while creating reservation", e);
+        }
+    }
+
+    @Override
+    public void updateReservationStatus(UUID reservationUuid, String status) {
+        String query = "UPDATE reservation SET status = ?::reservation_status WHERE uuid = ?";
+
+        try {
+
+            Connection conn = connectionManager.getNewConnection();
+            PreparedStatement stmt = conn.prepareStatement(query);
+
+            stmt.setString(1, status);
+            stmt.setObject(2, reservationUuid);
+
+            stmt.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to update reservation status for UUID: " + reservationUuid, e);
+        } catch (DatabaseException e) {
+            throw new RuntimeException("Database connection error while updating reservation status", e);
         }
     }
 }

@@ -11,4 +11,5 @@ public interface ReservationDao {
     public List<ReservationDto> getAllReservations();
     public List<ReservationDto> getReservationsByAgentUuid(UUID agentUuid);
     public void createReservation(UUID uuid, UUID agentUuid, UUID vehicleUuid, LocalDateTime startDate, LocalDateTime endDate, String status);
+    public void updateReservationStatus(UUID reservationUuid, String status);
 }

@@ -22,4 +22,14 @@ public class ReservationsInteractor {
             }
         };
     }
+
+    public Task<Void> createReturnVehicleTask(UUID reservationUuid, UUID vehicleUuid, int newKilometers) {
+        return new Task<>() {
+            @Override
+            protected Void call() {
+                reservationBroker.returnVehicle(reservationUuid, vehicleUuid, newKilometers);
+                return null;
+            }
+        };
+    }
 }
