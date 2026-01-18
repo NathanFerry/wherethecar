@@ -28,8 +28,10 @@ public class SimpleVehicleDao implements VehicleDao {
                        "seats, capacity, utility_weight, color, kilometers, acquisition_date, status " +
                        "FROM vehicle WHERE uuid = ?";
 
-        try (Connection conn = connectionManager.getNewConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+        try {
+
+            Connection conn = connectionManager.getNewConnection();
+            PreparedStatement stmt = conn.prepareStatement(query);
 
             stmt.setObject(1, uuid);
 
@@ -55,9 +57,11 @@ public class SimpleVehicleDao implements VehicleDao {
 
         List<VehicleDto> vehicles = new ArrayList<>();
 
-        try (Connection conn = connectionManager.getNewConnection();
-             PreparedStatement stmt = conn.prepareStatement(query);
-             ResultSet rs = stmt.executeQuery()) {
+        try {
+
+            Connection conn = connectionManager.getNewConnection();
+            PreparedStatement stmt = conn.prepareStatement(query);
+            ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
                 vehicles.add(mapResultSetToVehicleDto(rs));
@@ -89,6 +93,96 @@ public class SimpleVehicleDao implements VehicleDao {
             throw new RuntimeException("Failed to update vehicle status for UUID: " + vehicleUuid, e);
         } catch (DatabaseException e) {
             throw new RuntimeException("Database connection error while updating vehicle status", e);
+        }
+    }
+
+    @Override
+    public void createVehicle(VehicleDto vehicleDto) {
+        String query = "INSERT INTO vehicle (uuid, license_plate, manufacturer, model, energy, power, " +
+                       "seats, capacity, utility_weight, color, kilometers, acquisition_date, status) " +
+                       "VALUES (?, ?, ?, ?, ?::energy, ?, ?, ?, ?, ?, ?, ?, ?::vehicle_status)";
+
+        try {
+
+            Connection conn = connectionManager.getNewConnection();
+            PreparedStatement stmt = conn.prepareStatement(query);
+
+            stmt.setObject(1, vehicleDto.getUuid());
+            stmt.setString(2, vehicleDto.getLicensePlate());
+            stmt.setString(3, vehicleDto.getManufacturer());
+            stmt.setString(4, vehicleDto.getModel());
+            stmt.setString(5, vehicleDto.getEnergy());
+            stmt.setInt(6, vehicleDto.getPower());
+            stmt.setInt(7, vehicleDto.getSeats());
+            stmt.setInt(8, vehicleDto.getCapacity());
+            stmt.setInt(9, vehicleDto.getUtilityWeight());
+            stmt.setString(10, vehicleDto.getColor());
+            stmt.setInt(11, vehicleDto.getKilometers());
+            stmt.setTimestamp(12, vehicleDto.getAcquisitionDate() != null ?
+                Timestamp.valueOf(vehicleDto.getAcquisitionDate()) : null);
+            stmt.setString(13, vehicleDto.getStatus());
+
+            stmt.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to create vehicle", e);
+        } catch (DatabaseException e) {
+            throw new RuntimeException("Database connection error while creating vehicle", e);
+        }
+    }
+
+    @Override
+    public void updateVehicle(VehicleDto vehicleDto) {
+        String query = "UPDATE vehicle SET license_plate = ?, manufacturer = ?, model = ?, " +
+                       "energy = ?::energy, power = ?, seats = ?, capacity = ?, utility_weight = ?, " +
+                       "color = ?, kilometers = ?, acquisition_date = ?, status = ?::vehicle_status " +
+                       "WHERE uuid = ?";
+
+        try {
+
+            Connection conn = connectionManager.getNewConnection();
+            PreparedStatement stmt = conn.prepareStatement(query);
+
+            stmt.setString(1, vehicleDto.getLicensePlate());
+            stmt.setString(2, vehicleDto.getManufacturer());
+            stmt.setString(3, vehicleDto.getModel());
+            stmt.setString(4, vehicleDto.getEnergy());
+            stmt.setInt(5, vehicleDto.getPower());
+            stmt.setInt(6, vehicleDto.getSeats());
+            stmt.setInt(7, vehicleDto.getCapacity());
+            stmt.setInt(8, vehicleDto.getUtilityWeight());
+            stmt.setString(9, vehicleDto.getColor());
+            stmt.setInt(10, vehicleDto.getKilometers());
+            stmt.setTimestamp(11, vehicleDto.getAcquisitionDate() != null ?
+                Timestamp.valueOf(vehicleDto.getAcquisitionDate()) : null);
+            stmt.setString(12, vehicleDto.getStatus());
+            stmt.setObject(13, vehicleDto.getUuid());
+
+            stmt.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to update vehicle with UUID: " + vehicleDto.getUuid(), e);
+        } catch (DatabaseException e) {
+            throw new RuntimeException("Database connection error while updating vehicle", e);
+        }
+    }
+
+    @Override
+    public void deleteVehicle(UUID vehicleUuid) {
+        String query = "DELETE FROM vehicle WHERE uuid = ?";
+
+        try {
+
+            Connection conn = connectionManager.getNewConnection();
+            PreparedStatement stmt = conn.prepareStatement(query);
+
+            stmt.setObject(1, vehicleUuid);
+            stmt.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to delete vehicle with UUID: " + vehicleUuid, e);
+        } catch (DatabaseException e) {
+            throw new RuntimeException("Database connection error while deleting vehicle", e);
         }
     }
 

@@ -32,6 +32,34 @@ public class AgentBroker {
                 .collect(Collectors.toList());
     }
 
+    public void createAgent(Agent agent) {
+        AgentDto dto = new AgentDto(
+            agent.getUuid(),
+            agent.getFirstname(),
+            agent.getLastname(),
+            agent.getEmail(),
+            agent.getPasswordHash(),
+            agent.isAdmin()
+        );
+        agentDao.createAgent(dto);
+    }
+
+    public void updateAgent(Agent agent) {
+        AgentDto dto = new AgentDto(
+            agent.getUuid(),
+            agent.getFirstname(),
+            agent.getLastname(),
+            agent.getEmail(),
+            agent.getPasswordHash(),
+            agent.isAdmin()
+        );
+        agentDao.updateAgent(dto);
+    }
+
+    public void deleteAgent(UUID agentUuid) {
+        agentDao.deleteAgent(agentUuid);
+    }
+
     private Agent convertToAgent(AgentDto dto) {
         return new Agent(
                 dto.getUuid(),
