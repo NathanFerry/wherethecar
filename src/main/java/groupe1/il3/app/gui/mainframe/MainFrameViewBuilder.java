@@ -1,6 +1,7 @@
 package groupe1.il3.app.gui.mainframe;
 
 import groupe1.il3.app.domain.authentication.SessionManager;
+import groupe1.il3.app.gui.header.HeaderController;
 import javafx.scene.control.Button;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Region;
@@ -26,14 +27,15 @@ public class MainFrameViewBuilder implements Builder<Region> {
         BorderPane panel = new BorderPane();
         panel.setPrefSize(1200, 800);
 
+        HeaderController headerController = new HeaderController();
+        panel.setTop(headerController.getView());
+
         panel.setLeft(this.navigationPanel());
 
-        // Bind center content to model property
         model.centerContentProperty().addListener((obs, oldVal, newVal) -> {
             panel.setCenter(newVal);
         });
 
-        // Show vehicle list by default
         showVehicleListAction.run();
 
         return panel;
