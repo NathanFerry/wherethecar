@@ -38,6 +38,9 @@ jlink {
         name = 'Wherethecar'
     }
 
+    addExtraDependencies("java.sql")
+    forceMerge 'postgresql'
+
     // Defining the JAVA_HOME path here is a BAD PRACTICE.
     javaHome = System.getenv("JAVA_HOME") ?: "/usr/lib/jvm/java-25-openjdk-amd64"
 
