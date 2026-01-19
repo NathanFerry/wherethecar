@@ -15,13 +15,15 @@ public class MainFrameViewBuilder implements Builder<Region> {
     private final Runnable showReservationsAction;
     private final Runnable showHistoryAction;
     private final Runnable showAdminPanelAction;
+    private final Runnable onLogout;
 
-    public MainFrameViewBuilder(MainFrameModel model, Runnable showVehicleListAction, Runnable showReservationsAction, Runnable showHistoryAction, Runnable showAdminPanelAction) {
+    public MainFrameViewBuilder(MainFrameModel model, Runnable showVehicleListAction, Runnable showReservationsAction, Runnable showHistoryAction, Runnable showAdminPanelAction, Runnable onLogout) {
         this.model = model;
         this.showVehicleListAction = showVehicleListAction;
         this.showReservationsAction = showReservationsAction;
         this.showHistoryAction = showHistoryAction;
         this.showAdminPanelAction = showAdminPanelAction;
+        this.onLogout = onLogout;
     }
 
     @Override
@@ -29,7 +31,7 @@ public class MainFrameViewBuilder implements Builder<Region> {
         BorderPane panel = new BorderPane();
         panel.setPrefSize(1200, 800);
 
-        HeaderController headerController = new HeaderController();
+        HeaderController headerController = new HeaderController(onLogout);
         panel.setTop(headerController.getView());
 
         panel.setLeft(this.navigationPanel());

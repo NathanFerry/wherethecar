@@ -14,12 +14,14 @@ public class HeaderController {
     private final HeaderModel model;
     private final HeaderInteractor interactor;
     private final Builder<Region> viewBuilder;
+    private final Runnable onLogout;
     private Dialog<ButtonType> currentDialog;
 
-    public HeaderController() {
+    public HeaderController(Runnable onLogout) {
         this.model = new HeaderModel();
         this.interactor = new HeaderInteractor();
-        this.viewBuilder = new HeaderViewBuilder(model, this::showEditDialog);
+        this.onLogout = onLogout;
+        this.viewBuilder = new HeaderViewBuilder(model, this::showEditDialog, this::handleLogout);
 
         initializeUserInfo();
     }
@@ -102,5 +104,11 @@ public class HeaderController {
         });
 
         new Thread(updateTask).start();
+    }
+
+    private void handleLogout() {
+        if (onLogout != null) {
+            onLogout.run();
+        }
     }
 }

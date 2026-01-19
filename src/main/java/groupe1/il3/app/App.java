@@ -1,5 +1,6 @@
 package groupe1.il3.app;
 
+import groupe1.il3.app.domain.authentication.SessionManager;
 import groupe1.il3.app.gui.login.LoginController;
 import groupe1.il3.app.gui.mainframe.MainFrameController;
 import groupe1.il3.app.gui.style.StyleApplier;
@@ -32,9 +33,14 @@ public class App extends Application {
     }
 
     private void showMainFrame() {
-        MainFrameController mainFrameController = new MainFrameController();
+        MainFrameController mainFrameController = new MainFrameController(this::handleLogout);
         Scene mainScene = new Scene(mainFrameController.getView());
         StyleApplier.applyStylesheets(mainScene);
         primaryStage.setScene(mainScene);
+    }
+
+    private void handleLogout() {
+        SessionManager.getInstance().logout();
+        showLoginScreen();
     }
 }

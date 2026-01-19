@@ -14,10 +14,12 @@ public class HeaderViewBuilder implements Builder<Region> {
 
     private final HeaderModel model;
     private final Runnable onEditAction;
+    private final Runnable onLogoutAction;
 
-    public HeaderViewBuilder(HeaderModel model, Runnable onEditAction) {
+    public HeaderViewBuilder(HeaderModel model, Runnable onEditAction, Runnable onLogoutAction) {
         this.model = model;
         this.onEditAction = onEditAction;
+        this.onLogoutAction = onLogoutAction;
     }
 
     @Override
@@ -43,7 +45,11 @@ public class HeaderViewBuilder implements Builder<Region> {
         editButton.setOnAction(e -> onEditAction.run());
         editButton.getStyleClass().add("header-edit-button");
 
-        rightBox.getChildren().addAll(userNameLabel, editButton);
+        Button logoutButton = new Button("Déconnexion");
+        logoutButton.setOnAction(e -> onLogoutAction.run());
+        logoutButton.getStyleClass().add("header-logout-button");
+
+        rightBox.getChildren().addAll(userNameLabel, editButton, logoutButton);
 
         header.setLeft(appNameLabel);
         header.setRight(rightBox);
