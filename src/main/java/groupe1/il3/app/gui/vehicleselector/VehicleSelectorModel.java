@@ -1,23 +1,24 @@
 package groupe1.il3.app.gui.vehicleselector;
 
 import groupe1.il3.app.domain.vehicle.Vehicle;
+import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 
 import java.time.LocalDateTime;
 
 public class VehicleSelectorModel {
-    private final ObservableList<Vehicle> vehicles = FXCollections.observableArrayList();
+    private final ListProperty<Vehicle> vehicles = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ObjectProperty<Vehicle> selectedVehicle = new SimpleObjectProperty<>();
     private final ObjectProperty<LocalDateTime> reservationStartDate = new SimpleObjectProperty<>();
     private final ObjectProperty<LocalDateTime> reservationEndDate = new SimpleObjectProperty<>();
     private final StringProperty reservationErrorMessage = new SimpleStringProperty("");
 
-    public ObservableList<Vehicle> getVehicles() {
+    public ListProperty<Vehicle> vehiclesProperty() {
         return vehicles;
     }
 

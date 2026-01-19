@@ -46,7 +46,7 @@ public class VehicleSelectorViewBuilder implements Builder<Region> {
         title.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
 
         ListView<Vehicle> vehicleListView = new ListView<>();
-        vehicleListView.setItems(model.getVehicles());
+        vehicleListView.setItems(model.vehiclesProperty());
         vehicleListView.setCellFactory(lv -> new VehicleListCell());
 
         // Bind selection to model

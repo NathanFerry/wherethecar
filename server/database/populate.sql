@@ -1,5 +1,5 @@
 INSERT INTO agent (uuid, firstname, lastname, email, password_hash, is_admin) VALUES
-    ('a1b2c3d4-e5f6-7890-abcd-ef1234567890', 'John', 'Smith', 'john.smith@wherethecar.com', '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918', true),
+    ('a1b2c3d4-e5f6-7890-abcd-ef1234567890', 'Test', 'Admin', 'admin@wtc.com', '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918', true),
     ('b2c3d4e5-f6a7-8901-bcde-f12345678901', 'Sarah', 'Johnson', 'sarah.johnson@wherethecar.com', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8', false),
     ('c3d4e5f6-a7b8-9012-cdef-123456789012', 'Michael', 'Brown', 'michael.brown@wherethecar.com', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8', false),
     ('d4e5f6a7-b8c9-0123-def1-234567890123', 'Aa', 'Bb', 'aa.bb@wtc.com', '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8', false),

@@ -2,6 +2,7 @@ package groupe1.il3.app.persistence.broker.reservation;
 
 import groupe1.il3.app.domain.agent.Agent;
 import groupe1.il3.app.domain.reservation.Reservation;
+import groupe1.il3.app.domain.reservation.ReservationStatus;
 import groupe1.il3.app.domain.vehicle.Status;
 import groupe1.il3.app.domain.vehicle.Vehicle;
 import groupe1.il3.app.persistence.broker.agent.AgentBroker;
@@ -46,8 +47,6 @@ public class ReservationBroker {
     public void createReservation(UUID agentUuid, UUID vehicleUuid, LocalDateTime startDate, LocalDateTime endDate) {
         UUID reservationUuid = UUID.randomUUID();
         reservationDao.createReservation(reservationUuid, agentUuid, vehicleUuid, startDate, endDate, "pending");
-
-        vehicleBroker.updateVehicleStatus(vehicleUuid, Status.RESERVED);
     }
 
     public void returnVehicle(UUID reservationUuid, UUID vehicleUuid, int newKilometers) {
@@ -74,6 +73,22 @@ public class ReservationBroker {
         }
     }
 
+    public List<Reservation> getPendingReservations() {
+        return reservationDao.getAllReservations().stream()
+                .filter(dto -> "pending".equals(dto.getStatus()))
+                .map(this::convertToReservation)
+                .collect(Collectors.toList());
+    }
+
+    public void approveReservation(UUID reservationUuid, UUID vehicleUuid) {
+        reservationDao.updateReservationStatus(reservationUuid, "confirmed");
+        vehicleBroker.updateVehicleStatus(vehicleUuid, Status.RESERVED);
+    }
+
+    public void cancelReservation(UUID reservationUuid) {
+        reservationDao.updateReservationStatus(reservationUuid, "cancelled");
+    }
+
     private Reservation convertToReservation(ReservationDto dto) {
         Agent agent = agentBroker.getAgentById(dto.getAgentUuid());
         Vehicle vehicle = vehicleBroker.getVehicleById(dto.getVehicleUuid());
@@ -83,7 +98,19 @@ public class ReservationBroker {
                 agent,
                 vehicle,
                 dto.getStart(),
-                dto.getEnd()
+                dto.getEnd(),
+                mapStringToReservationStatus(dto.getStatus())
         );
+    }
+
+    private ReservationStatus mapStringToReservationStatus(String status) {
+        if (status == null) return ReservationStatus.PENDING;
+        return switch (status.toLowerCase()) {
+            case "pending" -> ReservationStatus.PENDING;
+            case "confirmed" -> ReservationStatus.CONFIRMED;
+            case "cancelled" -> ReservationStatus.CANCELLED;
+            case "completed" -> ReservationStatus.COMPLETED;
+            default -> ReservationStatus.PENDING;
+        };
     }
 }

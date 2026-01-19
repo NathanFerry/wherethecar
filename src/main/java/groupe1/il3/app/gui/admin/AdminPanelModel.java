@@ -1,23 +1,26 @@
 package groupe1.il3.app.gui.admin;
 
 import groupe1.il3.app.domain.agent.Agent;
+import groupe1.il3.app.domain.reservation.Reservation;
 import groupe1.il3.app.domain.vehicle.Vehicle;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 
 public class AdminPanelModel {
 
-    private final ObservableList<Vehicle> vehicles = FXCollections.observableArrayList();
+    private final ListProperty<Vehicle> vehicles = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ObjectProperty<Vehicle> selectedVehicle = new SimpleObjectProperty<>();
 
-    private final ObservableList<Agent> agents = FXCollections.observableArrayList();
+    private final ListProperty<Agent> agents = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ObjectProperty<Agent> selectedAgent = new SimpleObjectProperty<>();
+
+    private final ListProperty<Reservation> pendingReservations = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final ObjectProperty<Reservation> selectedReservation = new SimpleObjectProperty<>();
 
     private final StringProperty errorMessage = new SimpleStringProperty("");
     private final StringProperty successMessage = new SimpleStringProperty("");
 
-    public ObservableList<Vehicle> vehiclesProperty() {
+    public ListProperty<Vehicle> vehiclesProperty() {
         return vehicles;
     }
 
@@ -33,7 +36,7 @@ public class AdminPanelModel {
         selectedVehicle.set(vehicle);
     }
 
-    public ObservableList<Agent> getAgents() {
+    public ListProperty<Agent> agentsProperty() {
         return agents;
     }
 
@@ -47,6 +50,22 @@ public class AdminPanelModel {
 
     public void setSelectedAgent(Agent agent) {
         selectedAgent.set(agent);
+    }
+
+    public ListProperty<Reservation> pendingReservationsProperty() {
+        return pendingReservations;
+    }
+
+    public ObjectProperty<Reservation> selectedReservationProperty() {
+        return selectedReservation;
+    }
+
+    public Reservation getSelectedReservation() {
+        return selectedReservation.get();
+    }
+
+    public void setSelectedReservation(Reservation reservation) {
+        selectedReservation.set(reservation);
     }
 
     public StringProperty errorMessageProperty() {

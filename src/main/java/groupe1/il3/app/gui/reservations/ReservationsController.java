@@ -37,8 +37,8 @@ public class ReservationsController {
 
         task.setOnSucceeded(event -> {
             model.setLoading(false);
-            model.getReservations().clear();
-            model.getReservations().addAll(task.getValue());
+            model.reservationsProperty().clear();
+            model.reservationsProperty().addAll(task.getValue());
         });
 
         task.setOnFailed(event -> {

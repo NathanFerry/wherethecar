@@ -1,6 +1,7 @@
 package groupe1.il3.app.gui.reservations;
 
 import groupe1.il3.app.domain.reservation.Reservation;
+import groupe1.il3.app.domain.reservation.ReservationStatus;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -42,7 +43,7 @@ public class ReservationsViewBuilder implements Builder<Region> {
         title.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
 
         ListView<Reservation> reservationListView = new ListView<>();
-        reservationListView.setItems(model.getReservations());
+        reservationListView.setItems(model.reservationsProperty());
         reservationListView.setCellFactory(lv -> new ReservationListCell());
 
         reservationListView.getSelectionModel().selectedItemProperty().addListener(
@@ -93,16 +94,25 @@ public class ReservationsViewBuilder implements Builder<Region> {
         detailsGrid.setVgap(10);
         detailsGrid.setPadding(new Insets(10));
 
+        VBox pendingNoticeBox = createPendingNoticeBox();
         VBox returnVehicleBox = createReturnVehicleBox();
 
         model.selectedReservationProperty().addListener((obs, oldVal, newVal) -> {
             detailsGrid.getChildren().clear();
+            pendingNoticeBox.setVisible(false);
+
             if (newVal != null) {
                 titleLabel.setText("Détails de la réservation");
+
+                // Show pending notice if reservation is pending
+                if (newVal.getStatus() == ReservationStatus.PENDING) {
+                    pendingNoticeBox.setVisible(true);
+                }
 
                 int row = 0;
 
                 addSectionHeader(detailsGrid, row++, "Période de réservation");
+                addDetailRow(detailsGrid, row++, "Statut:", formatReservationStatus(newVal.getStatus()));
                 addDetailRow(detailsGrid, row++, "Date de début:",
                     formatDateTime(newVal.getStartDate()));
                 addDetailRow(detailsGrid, row++, "Date de fin:",
@@ -138,9 +148,30 @@ public class ReservationsViewBuilder implements Builder<Region> {
             }
         });
 
-        detailsBox.getChildren().addAll(titleLabel, new Separator(), detailsGrid, new Separator(), returnVehicleBox);
+        detailsBox.getChildren().addAll(titleLabel, new Separator(), pendingNoticeBox, detailsGrid, new Separator(), returnVehicleBox);
 
         return detailsBox;
+    }
+
+    private VBox createPendingNoticeBox() {
+        VBox noticeBox = new VBox(10);
+        noticeBox.setPadding(new Insets(15));
+        noticeBox.setStyle("-fx-background-color: #fff3cd; -fx-border-color: #ffc107; -fx-border-width: 2; -fx-border-radius: 5; -fx-background-radius: 5;");
+
+        Label icon = new Label("⚠️");
+        icon.setStyle("-fx-font-size: 24px;");
+
+        Label titleLabel = new Label("Réservation en attente d'approbation");
+        titleLabel.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #856404;");
+
+        Label messageLabel = new Label("Cette réservation doit être approuvée par un administrateur avant que vous puissiez utiliser le véhicule.");
+        messageLabel.setStyle("-fx-text-fill: #856404;");
+        messageLabel.setWrapText(true);
+
+        noticeBox.getChildren().addAll(icon, titleLabel, messageLabel);
+        noticeBox.setVisible(false);
+
+        return noticeBox;
     }
 
     private VBox createReturnVehicleBox() {
@@ -203,7 +234,7 @@ public class ReservationsViewBuilder implements Builder<Region> {
         errorLabel.visibleProperty().bind(model.returnErrorMessageProperty().isNotEmpty());
 
         model.selectedReservationProperty().addListener((obs, oldVal, newVal) -> {
-            if (newVal != null && newVal.getVehicle() != null) {
+            if (newVal != null && newVal.getVehicle() != null && newVal.getStatus() == ReservationStatus.CONFIRMED) {
                 int currentKm = newVal.getVehicle().getKilometers();
                 currentKilometersLabel.setText("Kilométrage actuel: " + currentKm + " km");
                 newKilometersField.setText(String.valueOf(currentKm));
@@ -242,6 +273,16 @@ public class ReservationsViewBuilder implements Builder<Region> {
         return dateTime.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
     }
 
+    private String formatReservationStatus(ReservationStatus status) {
+        if (status == null) return "N/A";
+        return switch (status) {
+            case PENDING -> "En attente d'approbation";
+            case CONFIRMED -> "Confirmée";
+            case CANCELLED -> "Annulée";
+            case COMPLETED -> "Terminée";
+        };
+    }
+
     private String formatEnergy(String energy) {
         return switch (energy) {
             case "GASOLINE" -> "Essence";
@@ -266,35 +307,82 @@ public class ReservationsViewBuilder implements Builder<Region> {
                 VBox cellContent = new VBox(5);
                 cellContent.setPadding(new Insets(5));
 
-                Label vehicleLabel = new Label();
-                if (reservation.getVehicle() != null) {
-                    vehicleLabel.setText(reservation.getVehicle().getManufacturer() + " " +
-                                        reservation.getVehicle().getModel());
-                    vehicleLabel.setStyle("-fx-font-weight: bold;");
-                } else {
-                    vehicleLabel.setText("Véhicule inconnu");
-                    vehicleLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: gray;");
-                }
+                Label vehicleLabel = getVehicleTypeLabel(reservation);
+                Label statusLabel = getStatusLabel(reservation);
+                Label dateLabel = getReservationStartDateLabel(reservation);
+                Label endDateLabel = getReservationEndDateLabel(reservation);
 
-                Label dateLabel = new Label();
-                if (reservation.getStartDate() != null) {
-                    dateLabel.setText("Du " +
-                        reservation.getStartDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")));
-                } else {
-                    dateLabel.setText("Date non spécifiée");
-                }
-
-                Label endDateLabel = new Label();
-                if (reservation.getEndDate() != null) {
-                    endDateLabel.setText("Au " +
-                        reservation.getEndDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")));
-                } else {
-                    endDateLabel.setText("");
-                }
-
-                cellContent.getChildren().addAll(vehicleLabel, dateLabel, endDateLabel);
+                cellContent.getChildren().addAll(vehicleLabel, statusLabel, dateLabel, endDateLabel);
                 setGraphic(cellContent);
             }
+        }
+
+        private static Label getStatusLabel(Reservation reservation) {
+            Label statusLabel = new Label();
+            ReservationStatus status = reservation.getStatus();
+
+            if (status != null) {
+                String statusText = switch (status) {
+                    case PENDING -> "⏳ En attente";
+                    case CONFIRMED -> "✓ Confirmée";
+                    case CANCELLED -> "✗ Annulée";
+                    case COMPLETED -> "✓ Terminée";
+                };
+
+                String statusColor = switch (status) {
+                    case PENDING -> "-fx-text-fill: orange; -fx-font-weight: bold;";
+                    case CONFIRMED -> "-fx-text-fill: green; -fx-font-weight: bold;";
+                    case CANCELLED -> "-fx-text-fill: red; -fx-font-weight: bold;";
+                    case COMPLETED -> "-fx-text-fill: blue; -fx-font-weight: bold;";
+                };
+
+                statusLabel.setText(statusText);
+                statusLabel.setStyle(statusColor);
+            } else {
+                statusLabel.setText("Statut inconnu");
+                statusLabel.setStyle("-fx-text-fill: gray;");
+            }
+
+            return statusLabel;
+        }
+
+        private static Label getVehicleTypeLabel(Reservation reservation) {
+            Label vehicleLabel = new Label();
+
+            if (reservation.getVehicle() != null) {
+                vehicleLabel.setText(reservation.getVehicle().getManufacturer() + " " +
+                        reservation.getVehicle().getModel());
+                vehicleLabel.setStyle("-fx-font-weight: bold;");
+            } else {
+                vehicleLabel.setText("Véhicule inconnu");
+                vehicleLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: gray;");
+            }
+
+            return vehicleLabel;
+        }
+
+        private static Label getReservationStartDateLabel(Reservation reservation) {
+            Label dateLabel = new Label();
+
+            if (reservation.getStartDate() != null) {
+                dateLabel.setText("Du " +
+                        reservation.getStartDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")));
+            } else {
+                dateLabel.setText("Date non spécifiée");
+            }
+
+            return dateLabel;
+        }
+
+        private static Label getReservationEndDateLabel(Reservation reservation) {
+            Label endDateLabel = new Label();
+            if (reservation.getEndDate() != null) {
+                endDateLabel.setText("Au " +
+                        reservation.getEndDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")));
+            } else {
+                endDateLabel.setText("");
+            }
+            return endDateLabel;
         }
     }
 }

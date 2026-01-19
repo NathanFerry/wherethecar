@@ -1,6 +1,8 @@
 package groupe1.il3.app.gui.admin;
 
 import groupe1.il3.app.domain.agent.Agent;
+import groupe1.il3.app.domain.reservation.Reservation;
+import groupe1.il3.app.domain.reservation.ReservationStatus;
 import groupe1.il3.app.domain.vehicle.Energy;
 import groupe1.il3.app.domain.vehicle.Status;
 import groupe1.il3.app.domain.vehicle.Vehicle;
@@ -16,6 +18,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class AdminPanelViewBuilder implements Builder<Region> {
@@ -29,6 +32,9 @@ public class AdminPanelViewBuilder implements Builder<Region> {
     private final Consumer<Agent> addAgentAction;
     private final Consumer<Agent> editAgentAction;
     private final Consumer<UUID> deleteAgentAction;
+    private final Runnable loadPendingReservationsAction;
+    private final BiConsumer<UUID, UUID> approveReservationAction;
+    private final Consumer<UUID> cancelReservationAction;
 
     public AdminPanelViewBuilder(
         AdminPanelModel model,
@@ -39,7 +45,10 @@ public class AdminPanelViewBuilder implements Builder<Region> {
         Consumer<UUID> deleteVehicleAction,
         Consumer<Agent> addAgentAction,
         Consumer<Agent> editAgentAction,
-        Consumer<UUID> deleteAgentAction
+        Consumer<UUID> deleteAgentAction,
+        Runnable loadPendingReservationsAction,
+        BiConsumer<UUID, UUID> approveReservationAction,
+        Consumer<UUID> cancelReservationAction
     ) {
         this.model = model;
         this.loadVehiclesAction = loadVehiclesAction;
@@ -50,6 +59,9 @@ public class AdminPanelViewBuilder implements Builder<Region> {
         this.addAgentAction = addAgentAction;
         this.editAgentAction = editAgentAction;
         this.deleteAgentAction = deleteAgentAction;
+        this.loadPendingReservationsAction = loadPendingReservationsAction;
+        this.approveReservationAction = approveReservationAction;
+        this.cancelReservationAction = cancelReservationAction;
     }
 
     @Override
@@ -72,7 +84,11 @@ public class AdminPanelViewBuilder implements Builder<Region> {
         agentsTab.setClosable(false);
         agentsTab.setContent(createAgentsManagementPane());
 
-        tabPane.getTabs().addAll(vehiclesTab, agentsTab);
+        Tab reservationsTab = new Tab("Réservations en Attente");
+        reservationsTab.setClosable(false);
+        reservationsTab.setContent(createPendingReservationsPane());
+
+        tabPane.getTabs().addAll(vehiclesTab, agentsTab, reservationsTab);
 
         mainPane.setCenter(tabPane);
 
@@ -81,6 +97,7 @@ public class AdminPanelViewBuilder implements Builder<Region> {
 
         loadVehiclesAction.run();
         loadAgentsAction.run();
+        loadPendingReservationsAction.run();
 
         return mainPane;
     }
@@ -199,7 +216,7 @@ public class AdminPanelViewBuilder implements Builder<Region> {
         listTitle.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
 
         ListView<Agent> agentListView = new ListView<>();
-        agentListView.setItems(model.getAgents());
+        agentListView.setItems(model.agentsProperty());
         agentListView.setCellFactory(lv -> new ListCell<>() {
             @Override
             protected void updateItem(Agent agent, boolean empty) {
@@ -699,6 +716,182 @@ public class AdminPanelViewBuilder implements Builder<Region> {
             return java.util.HexFormat.of().formatHex(hash);
         } catch (java.security.NoSuchAlgorithmException e) {
             throw new RuntimeException("Failed to hash password", e);
+        }
+    }
+
+    private Region createPendingReservationsPane() {
+        BorderPane pane = new BorderPane();
+        pane.setPadding(new Insets(10));
+
+        VBox listPane = new VBox(10);
+        listPane.setPrefWidth(400);
+
+        Label listTitle = new Label("Réservations en Attente d'Approbation");
+        listTitle.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+
+        ListView<Reservation> reservationListView = new ListView<>();
+        reservationListView.setItems(model.pendingReservationsProperty());
+        reservationListView.setCellFactory(lv -> new ListCell<>() {
+            @Override
+            protected void updateItem(Reservation reservation, boolean empty) {
+                super.updateItem(reservation, empty);
+                if (empty || reservation == null) {
+                    setText(null);
+                } else {
+                    String agentName = reservation.getAgent() != null ?
+                        reservation.getAgent().getFirstname() + " " + reservation.getAgent().getLastname() : "Unknown";
+                    String vehicleInfo = reservation.getVehicle() != null ?
+                        reservation.getVehicle().getManufacturer() + " " + reservation.getVehicle().getModel() : "Unknown";
+                    setText(agentName + " - " + vehicleInfo);
+                }
+            }
+        });
+
+        reservationListView.getSelectionModel().selectedItemProperty().addListener(
+            (obs, oldVal, newVal) -> model.setSelectedReservation(newVal)
+        );
+
+        VBox.setVgrow(reservationListView, Priority.ALWAYS);
+
+        HBox buttonBox = new HBox(10);
+        Button approveBtn = new Button("Approuver");
+        approveBtn.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white;");
+        approveBtn.setOnAction(e -> confirmApproveReservation());
+        approveBtn.disableProperty().bind(model.selectedReservationProperty().isNull());
+
+        Button cancelBtn = new Button("Refuser");
+        cancelBtn.setStyle("-fx-background-color: #f44336; -fx-text-fill: white;");
+        cancelBtn.setOnAction(e -> confirmCancelReservation());
+        cancelBtn.disableProperty().bind(model.selectedReservationProperty().isNull());
+
+        Button refreshBtn = new Button("Actualiser");
+        refreshBtn.setOnAction(e -> loadPendingReservationsAction.run());
+
+        buttonBox.getChildren().addAll(approveBtn, cancelBtn, refreshBtn);
+
+        listPane.getChildren().addAll(listTitle, reservationListView, buttonBox);
+
+        pane.setLeft(listPane);
+
+        VBox detailsPane = createReservationDetailsPane();
+        pane.setCenter(detailsPane);
+
+        return pane;
+    }
+
+    private VBox createReservationDetailsPane() {
+        VBox detailsPane = new VBox(10);
+        detailsPane.setPadding(new Insets(20));
+        detailsPane.setAlignment(Pos.TOP_LEFT);
+
+        Label noSelectionLabel = new Label("Sélectionnez une réservation pour voir ses détails");
+
+        VBox detailsBox = new VBox(15);
+        Label titleLabel = new Label();
+        titleLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
+
+        GridPane detailsGrid = new GridPane();
+        detailsGrid.setHgap(15);
+        detailsGrid.setVgap(10);
+
+        model.selectedReservationProperty().addListener((obs, oldVal, newVal) -> {
+            detailsGrid.getChildren().clear();
+            if (newVal != null) {
+                titleLabel.setText("Détails de la Réservation");
+
+                addDetailRow(detailsGrid, 0, "UUID:", newVal.getUuid().toString());
+
+                if (newVal.getAgent() != null) {
+                    addDetailRow(detailsGrid, 1, "Agent:",
+                        newVal.getAgent().getFirstname() + " " + newVal.getAgent().getLastname());
+                    addDetailRow(detailsGrid, 2, "Email:", newVal.getAgent().getEmail());
+                }
+
+                if (newVal.getVehicle() != null) {
+                    addDetailRow(detailsGrid, 3, "Véhicule:",
+                        newVal.getVehicle().getManufacturer() + " " + newVal.getVehicle().getModel());
+                    addDetailRow(detailsGrid, 4, "Plaque:", newVal.getVehicle().getLicencePlate());
+                }
+
+                addDetailRow(detailsGrid, 5, "Date de début:",
+                    newVal.getStartDate() != null ?
+                    newVal.getStartDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")) : "N/A");
+                addDetailRow(detailsGrid, 6, "Date de fin:",
+                    newVal.getEndDate() != null ?
+                    newVal.getEndDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")) : "N/A");
+                addDetailRow(detailsGrid, 7, "Statut:", formatReservationStatus(newVal.getStatus()));
+            }
+        });
+
+        detailsBox.getChildren().addAll(titleLabel, new Separator(), detailsGrid);
+        detailsBox.visibleProperty().bind(model.selectedReservationProperty().isNotNull());
+
+        noSelectionLabel.visibleProperty().bind(model.selectedReservationProperty().isNull());
+
+        detailsPane.getChildren().addAll(noSelectionLabel, detailsBox);
+
+        return detailsPane;
+    }
+
+    private String formatReservationStatus(ReservationStatus status) {
+        if (status == null) return "N/A";
+        switch (status) {
+            case PENDING: return "En Attente";
+            case CONFIRMED: return "Confirmée";
+            case CANCELLED: return "Annulée";
+            case COMPLETED: return "Terminée";
+            default: return "Inconnu";
+        }
+    }
+
+    private void confirmApproveReservation() {
+        Reservation selected = model.getSelectedReservation();
+        if (selected == null) return;
+
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Confirmation d'approbation");
+        alert.setHeaderText("Approuver la réservation");
+
+        String agentName = selected.getAgent() != null ?
+            selected.getAgent().getFirstname() + " " + selected.getAgent().getLastname() : "Unknown";
+        String vehicleInfo = selected.getVehicle() != null ?
+            selected.getVehicle().getManufacturer() + " " + selected.getVehicle().getModel() : "Unknown";
+
+        alert.setContentText("Êtes-vous sûr de vouloir approuver cette réservation ?\n\n" +
+                           "Agent: " + agentName + "\n" +
+                           "Véhicule: " + vehicleInfo + "\n" +
+                           "Du: " + selected.getStartDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")) + "\n" +
+                           "Au: " + selected.getEndDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")));
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            approveReservationAction.accept(selected.getUuid(), selected.getVehicle().getUuid());
+        }
+    }
+
+    private void confirmCancelReservation() {
+        Reservation selected = model.getSelectedReservation();
+        if (selected == null) return;
+
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Confirmation de refus");
+        alert.setHeaderText("Refuser la réservation");
+
+        String agentName = selected.getAgent() != null ?
+            selected.getAgent().getFirstname() + " " + selected.getAgent().getLastname() : "Unknown";
+        String vehicleInfo = selected.getVehicle() != null ?
+            selected.getVehicle().getManufacturer() + " " + selected.getVehicle().getModel() : "Unknown";
+
+        alert.setContentText("Êtes-vous sûr de vouloir refuser cette réservation ?\n\n" +
+                           "Agent: " + agentName + "\n" +
+                           "Véhicule: " + vehicleInfo + "\n" +
+                           "Du: " + selected.getStartDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")) + "\n" +
+                           "Au: " + selected.getEndDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")) + "\n\n" +
+                           "Cette action est irréversible.");
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            cancelReservationAction.accept(selected.getUuid());
         }
     }
 

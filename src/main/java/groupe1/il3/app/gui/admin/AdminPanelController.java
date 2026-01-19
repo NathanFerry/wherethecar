@@ -1,6 +1,7 @@
 package groupe1.il3.app.gui.admin;
 
 import groupe1.il3.app.domain.agent.Agent;
+import groupe1.il3.app.domain.reservation.Reservation;
 import groupe1.il3.app.domain.vehicle.Vehicle;
 import javafx.concurrent.Task;
 import javafx.scene.layout.Region;
@@ -27,7 +28,10 @@ public class AdminPanelController {
             this::deleteVehicle,
             this::addAgent,
             this::editAgent,
-            this::deleteAgent
+            this::deleteAgent,
+            this::loadPendingReservations,
+            this::approveReservation,
+            this::cancelReservation
         );
     }
 
@@ -61,8 +65,8 @@ public class AdminPanelController {
         Task<List<Agent>> task = interactor.createLoadAgentsTask();
 
         task.setOnSucceeded(event -> {
-            model.getAgents().clear();
-            model.getAgents().addAll(task.getValue());
+            model.agentsProperty().clear();
+            model.agentsProperty().addAll(task.getValue());
         });
 
         task.setOnFailed(event -> {
@@ -181,6 +185,63 @@ public class AdminPanelController {
 
         task.setOnFailed(event -> {
             model.setErrorMessage("Erreur lors de la suppression de l'agent: " + task.getException().getMessage());
+            task.getException().printStackTrace();
+        });
+
+        new Thread(task).start();
+    }
+
+    private void loadPendingReservations() {
+        model.setErrorMessage("");
+        model.setSuccessMessage("");
+
+        Task<List<Reservation>> task = interactor.createLoadPendingReservationsTask();
+
+        task.setOnSucceeded(event -> {
+            model.pendingReservationsProperty().clear();
+            model.pendingReservationsProperty().addAll(task.getValue());
+        });
+
+        task.setOnFailed(event -> {
+            model.setErrorMessage("Erreur lors du chargement des réservations en attente: " + task.getException().getMessage());
+            task.getException().printStackTrace();
+        });
+
+        new Thread(task).start();
+    }
+
+    private void approveReservation(UUID reservationUuid, UUID vehicleUuid) {
+        model.setErrorMessage("");
+        model.setSuccessMessage("");
+
+        Task<Void> task = interactor.approveReservationTask(reservationUuid, vehicleUuid);
+
+        task.setOnSucceeded(event -> {
+            model.setSuccessMessage("Réservation approuvée avec succès");
+            loadPendingReservations();
+        });
+
+        task.setOnFailed(event -> {
+            model.setErrorMessage("Erreur lors de l'approbation de la réservation: " + task.getException().getMessage());
+            task.getException().printStackTrace();
+        });
+
+        new Thread(task).start();
+    }
+
+    private void cancelReservation(UUID reservationUuid) {
+        model.setErrorMessage("");
+        model.setSuccessMessage("");
+
+        Task<Void> task = interactor.cancelReservationTask(reservationUuid);
+
+        task.setOnSucceeded(event -> {
+            model.setSuccessMessage("Réservation refusée avec succès");
+            loadPendingReservations();
+        });
+
+        task.setOnFailed(event -> {
+            model.setErrorMessage("Erreur lors du refus de la réservation: " + task.getException().getMessage());
             task.getException().printStackTrace();
         });
 
