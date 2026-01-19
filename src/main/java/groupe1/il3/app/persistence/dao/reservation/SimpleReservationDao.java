@@ -34,12 +34,12 @@ public class SimpleReservationDao implements ReservationDao {
 
             stmt.setObject(1, uuid);
 
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return mapResultSetToReservationDto(rs);
-                }
-                return null;
+           ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return mapResultSetToReservationDto(rs);
             }
+
+            return null;
 
         } catch (SQLException e) {
             throw new RuntimeException("Failed to retrieve reservation with UUID: " + uuid, e);
@@ -75,7 +75,7 @@ public class SimpleReservationDao implements ReservationDao {
     }
 
     @Override
-    public List<ReservationDto> getReservationsByAgentUuid(UUID agentUuid) {
+    public List<ReservationDto> getActiveReservationsByAgentUuid(UUID agentUuid) {
         String query = "SELECT uuid, agent_uuid, vehicle_uuid, start_date, end_date, status " +
                        "FROM reservation WHERE agent_uuid = ? AND status NOT IN ('completed', 'cancelled') " +
                        "ORDER BY start_date ASC";
@@ -100,6 +100,35 @@ public class SimpleReservationDao implements ReservationDao {
             throw new RuntimeException("Failed to retrieve reservations for agent: " + agentUuid, e);
         } catch (DatabaseException e) {
             throw new RuntimeException("Database connection error while retrieving agent reservations", e);
+        }
+    }
+
+    @Override
+    public List<ReservationDto> getHistoricalReservationsByAgentUuid(UUID agentUuid) {
+        String query = "SELECT uuid, agent_uuid, vehicle_uuid, start_date, end_date, status " +
+                       "FROM reservation WHERE agent_uuid = ? AND status IN ('completed', 'cancelled') " +
+                       "ORDER BY start_date DESC";
+
+        List<ReservationDto> reservations = new ArrayList<>();
+
+        try {
+
+            Connection conn = connectionManager.getNewConnection();
+            PreparedStatement stmt = conn.prepareStatement(query);
+
+            stmt.setObject(1, agentUuid);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    reservations.add(mapResultSetToReservationDto(rs));
+                }
+                return reservations;
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to retrieve historical reservations for agent: " + agentUuid, e);
+        } catch (DatabaseException e) {
+            throw new RuntimeException("Database connection error while retrieving agent historical reservations", e);
         }
     }
 

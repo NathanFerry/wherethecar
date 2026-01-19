@@ -13,12 +13,14 @@ public class MainFrameViewBuilder implements Builder<Region> {
     private final MainFrameModel model;
     private final Runnable showVehicleListAction;
     private final Runnable showReservationsAction;
+    private final Runnable showHistoryAction;
     private final Runnable showAdminPanelAction;
 
-    public MainFrameViewBuilder(MainFrameModel model, Runnable showVehicleListAction, Runnable showReservationsAction, Runnable showAdminPanelAction) {
+    public MainFrameViewBuilder(MainFrameModel model, Runnable showVehicleListAction, Runnable showReservationsAction, Runnable showHistoryAction, Runnable showAdminPanelAction) {
         this.model = model;
         this.showVehicleListAction = showVehicleListAction;
         this.showReservationsAction = showReservationsAction;
+        this.showHistoryAction = showHistoryAction;
         this.showAdminPanelAction = showAdminPanelAction;
     }
 
@@ -51,6 +53,9 @@ public class MainFrameViewBuilder implements Builder<Region> {
         Button reservationsBtn = this.navigationButton("Mes réservations");
         reservationsBtn.setOnAction(e -> showReservationsAction.run());
 
+        Button historyBtn = this.navigationButton("Historique");
+        historyBtn.setOnAction(e -> showHistoryAction.run());
+
         Button adminBtn = this.navigationButton("Administration");
         adminBtn.setOnAction(e -> showAdminPanelAction.run());
 
@@ -59,7 +64,7 @@ public class MainFrameViewBuilder implements Builder<Region> {
         adminBtn.setVisible(isAdmin);
         adminBtn.setManaged(isAdmin);
 
-        navPanel.getChildren().addAll(vehiclesBtn, reservationsBtn, adminBtn);
+        navPanel.getChildren().addAll(vehiclesBtn, reservationsBtn, historyBtn, adminBtn);
 
         return navPanel;
     }

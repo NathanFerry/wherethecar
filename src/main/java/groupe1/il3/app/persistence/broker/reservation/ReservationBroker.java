@@ -39,7 +39,13 @@ public class ReservationBroker {
     }
 
     public List<Reservation> getReservationsByAgentUuid(UUID agentUuid) {
-        return reservationDao.getReservationsByAgentUuid(agentUuid).stream()
+        return reservationDao.getActiveReservationsByAgentUuid(agentUuid).stream()
+                .map(this::convertToReservation)
+                .collect(Collectors.toList());
+    }
+
+    public List<Reservation> getHistoricalReservationsByAgentUuid(UUID agentUuid) {
+        return reservationDao.getHistoricalReservationsByAgentUuid(agentUuid).stream()
                 .map(this::convertToReservation)
                 .collect(Collectors.toList());
     }
