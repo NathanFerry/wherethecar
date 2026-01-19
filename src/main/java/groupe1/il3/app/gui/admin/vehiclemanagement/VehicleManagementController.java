@@ -25,7 +25,8 @@ public class VehicleManagementController {
             this::loadVehicles,
             this::addVehicle,
             this::editVehicle,
-            this::deleteVehicle
+            this::deleteVehicle,
+            messageHandler
         );
     }
 

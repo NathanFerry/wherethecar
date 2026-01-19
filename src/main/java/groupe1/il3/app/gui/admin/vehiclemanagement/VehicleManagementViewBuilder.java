@@ -3,6 +3,7 @@ package groupe1.il3.app.gui.admin.vehiclemanagement;
 import groupe1.il3.app.domain.vehicle.Energy;
 import groupe1.il3.app.domain.vehicle.Status;
 import groupe1.il3.app.domain.vehicle.Vehicle;
+import groupe1.il3.app.gui.admin.maintenancemanagement.MaintenanceManagementController;
 import groupe1.il3.app.gui.style.StyleApplier;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -17,6 +18,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class VehicleManagementViewBuilder implements Builder<Region> {
@@ -26,19 +28,23 @@ public class VehicleManagementViewBuilder implements Builder<Region> {
     private final Consumer<Vehicle> addVehicleAction;
     private final Consumer<Vehicle> editVehicleAction;
     private final Consumer<UUID> deleteVehicleAction;
+    private final BiConsumer<String, String> messageHandler;
+    private MaintenanceManagementController maintenanceController;
 
     public VehicleManagementViewBuilder(
         VehicleManagementModel model,
         Runnable loadVehiclesAction,
         Consumer<Vehicle> addVehicleAction,
         Consumer<Vehicle> editVehicleAction,
-        Consumer<UUID> deleteVehicleAction
+        Consumer<UUID> deleteVehicleAction,
+        BiConsumer<String, String> messageHandler
     ) {
         this.model = model;
         this.loadVehiclesAction = loadVehiclesAction;
         this.addVehicleAction = addVehicleAction;
         this.editVehicleAction = editVehicleAction;
         this.deleteVehicleAction = deleteVehicleAction;
+        this.messageHandler = messageHandler;
     }
 
     @Override
@@ -121,12 +127,27 @@ public class VehicleManagementViewBuilder implements Builder<Region> {
         Label titleLabel = new Label();
         titleLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
 
+        TabPane tabPane = new TabPane();
+        tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
+
+        Tab detailsTab = new Tab("Détails");
         GridPane detailsGrid = new GridPane();
         detailsGrid.setHgap(15);
         detailsGrid.setVgap(10);
+        ScrollPane detailsScrollPane = new ScrollPane(detailsGrid);
+        detailsScrollPane.setFitToWidth(true);
+        detailsTab.setContent(detailsScrollPane);
+
+        Tab maintenanceTab = new Tab("Opérations de Maintenance");
+        VBox maintenanceBox = new VBox();
+        maintenanceTab.setContent(maintenanceBox);
+
+        tabPane.getTabs().addAll(detailsTab, maintenanceTab);
 
         model.selectedVehicleProperty().addListener((obs, oldVal, newVal) -> {
             detailsGrid.getChildren().clear();
+            maintenanceBox.getChildren().clear();
+
             if (newVal != null) {
                 titleLabel.setText(newVal.getManufacturer() + " " + newVal.getModel());
 
@@ -145,15 +166,25 @@ public class VehicleManagementViewBuilder implements Builder<Region> {
                     newVal.getAcquisitionDate() != null ?
                     newVal.getAcquisitionDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) : "N/A");
                 addDetailRow(detailsGrid, 12, "Statut:", formatStatus(newVal.getStatus()));
+
+                // Initialize maintenance controller for the selected vehicle
+                maintenanceController = new MaintenanceManagementController(
+                    newVal.getUuid(),
+                    messageHandler
+                );
+                maintenanceBox.getChildren().add(maintenanceController.getView());
+                maintenanceController.loadMaintenanceOperations();
             }
         });
 
-        detailsBox.getChildren().addAll(titleLabel, new Separator(), detailsGrid);
+        detailsBox.getChildren().addAll(titleLabel, new Separator(), tabPane);
         detailsBox.visibleProperty().bind(model.selectedVehicleProperty().isNotNull());
 
         noSelectionLabel.visibleProperty().bind(model.selectedVehicleProperty().isNull());
 
         detailsPane.getChildren().addAll(noSelectionLabel, detailsBox);
+
+        VBox.setVgrow(tabPane, Priority.ALWAYS);
 
         return detailsPane;
     }

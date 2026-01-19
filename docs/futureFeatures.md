@@ -1,0 +1,3 @@
+- searchbar in multiple pages to ease navigation
+- dark mode for better user experience in low light conditions
+- advanced reporting features for detailed analytics
