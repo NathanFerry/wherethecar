@@ -2,6 +2,7 @@ package groupe1.il3.app.gui.admin.reservationmanagement;
 
 import groupe1.il3.app.domain.reservation.Reservation;
 import groupe1.il3.app.domain.reservation.ReservationStatus;
+import groupe1.il3.app.gui.style.StyleApplier;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -198,9 +199,10 @@ public class ReservationManagementViewBuilder implements Builder<Region> {
         if (selected == null) return;
 
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Confirmation de refus");
+        StyleApplier.applyStylesheets(alert);
+        alert.setTitle("Confirmer le refus");
         alert.setHeaderText("Refuser la réservation");
-
+        alert.setContentText("Voulez-vous vraiment refuser cette réservation ?");
         String agentName = selected.getAgent() != null ?
             selected.getAgent().getFirstname() + " " + selected.getAgent().getLastname() : "Unknown";
         String vehicleInfo = selected.getVehicle() != null ?

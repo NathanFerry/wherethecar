@@ -46,6 +46,7 @@ public class MainFrameViewBuilder implements Builder<Region> {
     private Region navigationPanel() {
         VBox navPanel = new VBox(10);
         navPanel.setPrefWidth(200);
+        navPanel.getStyleClass().add("navigation-panel");
 
         Button vehiclesBtn = this.navigationButton("Liste des véhicules");
         vehiclesBtn.setOnAction(e -> showVehicleListAction.run());
@@ -72,6 +73,7 @@ public class MainFrameViewBuilder implements Builder<Region> {
     private Button navigationButton(String title) {
         Button btn = new Button(title);
         btn.setMaxWidth(Double.MAX_VALUE);
+        btn.getStyleClass().add("nav-button");
         return btn;
     }
 }

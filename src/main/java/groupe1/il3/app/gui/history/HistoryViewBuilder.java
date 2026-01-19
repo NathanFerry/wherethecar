@@ -145,14 +145,15 @@ public class HistoryViewBuilder implements Builder<Region> {
 
     private void addSectionHeader(GridPane grid, int row, String title) {
         Label headerLabel = new Label(title);
-        headerLabel.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
+        headerLabel.getStyleClass().add("reservation-section-header");
         grid.add(headerLabel, 0, row, 2, 1);
     }
 
     private void addDetailRow(GridPane grid, int row, String label, String value) {
         Label labelNode = new Label(label);
-        labelNode.setStyle("-fx-font-weight: bold;");
+        labelNode.getStyleClass().add("reservation-detail-label");
         Label valueNode = new Label(value);
+        valueNode.getStyleClass().add("reservation-detail-value");
 
         grid.add(labelNode, 0, row);
         grid.add(valueNode, 1, row);
@@ -221,18 +222,18 @@ public class HistoryViewBuilder implements Builder<Region> {
                     case COMPLETED -> "✓ Terminée";
                 };
 
-                String statusColor = switch (status) {
-                    case PENDING -> "-fx-text-fill: orange; -fx-font-weight: bold;";
-                    case CONFIRMED -> "-fx-text-fill: green; -fx-font-weight: bold;";
-                    case CANCELLED -> "-fx-text-fill: red; -fx-font-weight: bold;";
-                    case COMPLETED -> "-fx-text-fill: blue; -fx-font-weight: bold;";
+                String statusClass = switch (status) {
+                    case PENDING -> "reservation-status-pending";
+                    case CONFIRMED -> "reservation-status-confirmed";
+                    case CANCELLED -> "reservation-status-cancelled";
+                    case COMPLETED -> "reservation-status-completed";
                 };
 
                 statusLabel.setText(statusText);
-                statusLabel.setStyle(statusColor);
+                statusLabel.getStyleClass().add(statusClass);
             } else {
                 statusLabel.setText("Statut inconnu");
-                statusLabel.setStyle("-fx-text-fill: gray;");
+                statusLabel.getStyleClass().add("text-muted");
             }
 
             return statusLabel;
@@ -244,10 +245,10 @@ public class HistoryViewBuilder implements Builder<Region> {
             if (reservation.getVehicle() != null) {
                 vehicleLabel.setText(reservation.getVehicle().getManufacturer() + " " +
                         reservation.getVehicle().getModel());
-                vehicleLabel.setStyle("-fx-font-weight: bold;");
+                vehicleLabel.getStyleClass().add("label-bold");
             } else {
                 vehicleLabel.setText("Véhicule inconnu");
-                vehicleLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: gray;");
+                vehicleLabel.getStyleClass().addAll("label-bold", "text-muted");
             }
 
             return vehicleLabel;

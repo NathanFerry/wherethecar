@@ -1,6 +1,7 @@
 package groupe1.il3.app.gui.vehicleselector;
 
 import groupe1.il3.app.domain.vehicle.Vehicle;
+import groupe1.il3.app.gui.style.StyleApplier;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -42,15 +43,15 @@ public class VehicleSelectorViewBuilder implements Builder<Region> {
         VBox listPane = new VBox(10);
         listPane.setPadding(new Insets(10));
         listPane.setPrefWidth(350);
+        listPane.getStyleClass().add("vehicle-list-container");
 
         Label title = new Label("Liste des Véhicules");
-        title.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
+        title.getStyleClass().add("vehicle-list-title");
 
         ListView<Vehicle> vehicleListView = new ListView<>();
         vehicleListView.setItems(model.vehiclesProperty());
         vehicleListView.setCellFactory(lv -> new VehicleListCell());
 
-        // Bind selection to model
         vehicleListView.getSelectionModel().selectedItemProperty().addListener(
             (obs, oldVal, newVal) -> model.setSelectedVehicle(newVal)
         );
@@ -60,6 +61,7 @@ public class VehicleSelectorViewBuilder implements Builder<Region> {
         Button refreshButton = new Button("Actualiser");
         refreshButton.setOnAction(e -> loadVehiclesAction.run());
         refreshButton.setMaxWidth(Double.MAX_VALUE);
+        refreshButton.getStyleClass().add("vehicle-refresh-button");
 
         listPane.getChildren().addAll(title, vehicleListView, refreshButton);
 
@@ -69,8 +71,10 @@ public class VehicleSelectorViewBuilder implements Builder<Region> {
     private Region createVehicleDetailsPane() {
         StackPane detailsPane = new StackPane();
         detailsPane.setPadding(new Insets(20));
+        detailsPane.getStyleClass().add("vehicle-details-pane");
 
         Label noSelectionLabel = new Label("Sélectionnez un véhicule pour voir ses détails");
+        noSelectionLabel.getStyleClass().add("no-selection-label");
 
         VBox detailsBox = createDetailsBox();
 
@@ -88,6 +92,7 @@ public class VehicleSelectorViewBuilder implements Builder<Region> {
         detailsBox.setAlignment(Pos.TOP_LEFT);
 
         Label titleLabel = new Label();
+        titleLabel.getStyleClass().add("vehicle-details-title");
 
         GridPane detailsGrid = new GridPane();
         detailsGrid.setHgap(15);
@@ -97,8 +102,8 @@ public class VehicleSelectorViewBuilder implements Builder<Region> {
         Button reserveButton = new Button("Réserver ce véhicule");
         reserveButton.setOnAction(e -> showReservationDialog());
         reserveButton.setMaxWidth(Double.MAX_VALUE);
+        reserveButton.getStyleClass().add("vehicle-reserve-button");
 
-        // Only enable reserve button if vehicle is available
         reserveButton.disableProperty().bind(
             model.selectedVehicleProperty().isNull().or(
                 model.selectedVehicleProperty().isNotNull().and(
@@ -142,7 +147,9 @@ public class VehicleSelectorViewBuilder implements Builder<Region> {
 
     private void addDetailRow(GridPane grid, int row, String label, String value) {
         Label labelNode = new Label(label);
+        labelNode.getStyleClass().add("vehicle-detail-label");
         Label valueNode = new Label(value);
+        valueNode.getStyleClass().add("vehicle-detail-value");
 
         grid.add(labelNode, 0, row);
         grid.add(valueNode, 1, row);
@@ -173,6 +180,8 @@ public class VehicleSelectorViewBuilder implements Builder<Region> {
         Dialog<ButtonType> dialog = new Dialog<>();
         dialog.setTitle("Réserver un véhicule");
         dialog.setHeaderText("Réservation de " + model.getSelectedVehicle().getManufacturer() + " " + model.getSelectedVehicle().getModel());
+
+        StyleApplier.applyStylesheets(dialog);
 
         GridPane grid = new GridPane();
         grid.setHgap(10);
@@ -233,12 +242,14 @@ public class VehicleSelectorViewBuilder implements Builder<Region> {
 
                     if (model.getReservationErrorMessage().isEmpty()) {
                         Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                        StyleApplier.applyStylesheets(alert);
                         alert.setTitle("Réservation confirmée");
                         alert.setHeaderText(null);
                         alert.setContentText("Votre réservation a été créée avec succès!");
                         alert.showAndWait();
                     } else {
                         Alert alert = new Alert(Alert.AlertType.ERROR);
+                        StyleApplier.applyStylesheets(alert);
                         alert.setTitle("Erreur de réservation");
                         alert.setHeaderText(null);
                         alert.setContentText(model.getReservationErrorMessage());
@@ -246,6 +257,7 @@ public class VehicleSelectorViewBuilder implements Builder<Region> {
                     }
                 } catch (Exception e) {
                     Alert alert = new Alert(Alert.AlertType.ERROR);
+                    StyleApplier.applyStylesheets(alert);
                     alert.setTitle("Erreur");
                     alert.setHeaderText(null);
                     alert.setContentText("Format de date/heure invalide. Utilisez HH:mm pour l'heure (ex: 09:00)");
@@ -265,10 +277,24 @@ public class VehicleSelectorViewBuilder implements Builder<Region> {
                 setGraphic(null);
             } else {
                 VBox content = new VBox(3);
+                content.getStyleClass().add("vehicle-list-cell");
 
                 Label titleLabel = new Label(vehicle.getManufacturer() + " " + vehicle.getModel());
+                titleLabel.getStyleClass().add("vehicle-manufacturer");
+
                 Label plateLabel = new Label(vehicle.getLicencePlate());
+                plateLabel.getStyleClass().add("vehicle-license-plate");
+
                 Label statusLabel = new Label(formatStatusForCell(vehicle.getStatus().toString()));
+                String statusClass = switch (vehicle.getStatus().toString()) {
+                    case "AVAILABLE" -> "vehicle-status-available";
+                    case "RESERVED" -> "vehicle-status-reserved";
+                    case "MAINTENANCE" -> "vehicle-status-maintenance";
+                    default -> "";
+                };
+                if (!statusClass.isEmpty()) {
+                    statusLabel.getStyleClass().add(statusClass);
+                }
 
                 content.getChildren().addAll(titleLabel, plateLabel, statusLabel);
                 setGraphic(content);
@@ -278,9 +304,9 @@ public class VehicleSelectorViewBuilder implements Builder<Region> {
 
         private static String formatStatusForCell(String status) {
             return switch (status) {
-                case "AVAILABLE" -> "Disponible";
-                case "RESERVED" -> "Réservé";
-                case "MAINTENANCE" -> "Maintenance";
+                case "AVAILABLE" -> "✓ Disponible";
+                case "RESERVED" -> "⏳ Réservé";
+                case "MAINTENANCE" -> "🔧 Maintenance";
                 default -> "Inconnu";
             };
         }

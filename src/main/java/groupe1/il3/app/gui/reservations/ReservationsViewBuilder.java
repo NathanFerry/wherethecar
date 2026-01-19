@@ -2,6 +2,7 @@ package groupe1.il3.app.gui.reservations;
 
 import groupe1.il3.app.domain.reservation.Reservation;
 import groupe1.il3.app.domain.reservation.ReservationStatus;
+import groupe1.il3.app.gui.style.StyleApplier;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -69,9 +70,10 @@ public class ReservationsViewBuilder implements Builder<Region> {
     private Region createReservationDetailsPane() {
         StackPane detailsPane = new StackPane();
         detailsPane.setPadding(new Insets(20));
+        detailsPane.getStyleClass().add("reservation-details-pane");
 
         Label noSelectionLabel = new Label("Sélectionnez une réservation pour voir ses détails");
-        noSelectionLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: gray;");
+        noSelectionLabel.getStyleClass().add("no-selection-label");
 
         VBox detailsBox = createDetailsBox();
 
@@ -105,7 +107,6 @@ public class ReservationsViewBuilder implements Builder<Region> {
             if (newVal != null) {
                 titleLabel.setText("Détails de la réservation");
 
-                // Show pending notice if reservation is pending
                 if (newVal.getStatus() == ReservationStatus.PENDING) {
                     pendingNoticeBox.setVisible(true);
                 }
@@ -208,8 +209,10 @@ public class ReservationsViewBuilder implements Builder<Region> {
         kilometersBox.getChildren().addAll(currentKilometersLabel, newKilometersLabel, newKilometersField);
 
         Button returnButton = new Button("Retourner le véhicule");
+        returnButton.getStyleClass().add("return-button");
         returnButton.setOnAction(e -> {
             Alert confirmDialog = new Alert(Alert.AlertType.CONFIRMATION);
+            StyleApplier.applyStylesheets(confirmDialog);
             confirmDialog.setTitle("Confirmer le retour");
             confirmDialog.setHeaderText("Retour du véhicule");
             confirmDialog.setContentText("Êtes-vous sûr de vouloir retourner ce véhicule ?");
@@ -220,6 +223,7 @@ public class ReservationsViewBuilder implements Builder<Region> {
 
                     if (model.getReturnErrorMessage().isEmpty()) {
                         Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
+                        StyleApplier.applyStylesheets(successAlert);
                         successAlert.setTitle("Retour confirmé");
                         successAlert.setHeaderText("Véhicule retourné avec succès");
                         successAlert.setContentText("Le véhicule a été retourné et le kilométrage a été mis à jour.");
@@ -330,18 +334,18 @@ public class ReservationsViewBuilder implements Builder<Region> {
                     case COMPLETED -> "✓ Terminée";
                 };
 
-                String statusColor = switch (status) {
-                    case PENDING -> "-fx-text-fill: orange; -fx-font-weight: bold;";
-                    case CONFIRMED -> "-fx-text-fill: green; -fx-font-weight: bold;";
-                    case CANCELLED -> "-fx-text-fill: red; -fx-font-weight: bold;";
-                    case COMPLETED -> "-fx-text-fill: blue; -fx-font-weight: bold;";
+                String statusClass = switch (status) {
+                    case PENDING -> "reservation-status-pending";
+                    case CONFIRMED -> "reservation-status-confirmed";
+                    case CANCELLED -> "reservation-status-cancelled";
+                    case COMPLETED -> "reservation-status-completed";
                 };
 
                 statusLabel.setText(statusText);
-                statusLabel.setStyle(statusColor);
+                statusLabel.getStyleClass().add(statusClass);
             } else {
                 statusLabel.setText("Statut inconnu");
-                statusLabel.setStyle("-fx-text-fill: gray;");
+                statusLabel.getStyleClass().add("text-muted");
             }
 
             return statusLabel;
@@ -353,10 +357,10 @@ public class ReservationsViewBuilder implements Builder<Region> {
             if (reservation.getVehicle() != null) {
                 vehicleLabel.setText(reservation.getVehicle().getManufacturer() + " " +
                         reservation.getVehicle().getModel());
-                vehicleLabel.setStyle("-fx-font-weight: bold;");
+                vehicleLabel.getStyleClass().add("label-bold");
             } else {
                 vehicleLabel.setText("Véhicule inconnu");
-                vehicleLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: gray;");
+                vehicleLabel.getStyleClass().addAll("label-bold", "text-muted");
             }
 
             return vehicleLabel;

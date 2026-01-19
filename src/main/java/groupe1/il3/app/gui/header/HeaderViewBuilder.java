@@ -1,5 +1,6 @@
 package groupe1.il3.app.gui.header;
 
+import groupe1.il3.app.gui.style.StyleApplier;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -23,9 +24,11 @@ public class HeaderViewBuilder implements Builder<Region> {
     public Region build() {
         BorderPane header = new BorderPane();
         header.setPadding(new Insets(10, 20, 10, 20));
+        header.getStyleClass().add("header-container");
 
         Label appNameLabel = new Label();
         appNameLabel.textProperty().bind(model.appNameProperty());
+        appNameLabel.getStyleClass().add("header-app-name");
 
         HBox rightBox = new HBox(10);
         rightBox.setAlignment(Pos.CENTER_RIGHT);
@@ -34,9 +37,11 @@ public class HeaderViewBuilder implements Builder<Region> {
         userNameLabel.textProperty().bind(
             model.userFirstnameProperty().concat(" ").concat(model.userLastnameProperty())
         );
+        userNameLabel.getStyleClass().add("header-username");
 
         Button editButton = new Button("Modifier");
         editButton.setOnAction(e -> onEditAction.run());
+        editButton.getStyleClass().add("header-edit-button");
 
         rightBox.getChildren().addAll(userNameLabel, editButton);
 
@@ -50,6 +55,8 @@ public class HeaderViewBuilder implements Builder<Region> {
         Dialog<ButtonType> dialog = new Dialog<>();
         dialog.setTitle("Modifier les informations");
         dialog.setHeaderText("Modifier votre email et/ou mot de passe");
+
+        StyleApplier.applyStylesheets(dialog);
 
         GridPane grid = new GridPane();
         grid.setHgap(10);
@@ -73,11 +80,13 @@ public class HeaderViewBuilder implements Builder<Region> {
 
         Label errorLabel = new Label();
         errorLabel.textProperty().bind(model.errorMessageProperty());
+        errorLabel.getStyleClass().add("error-message");
         errorLabel.managedProperty().bind(errorLabel.textProperty().isNotEmpty());
         errorLabel.visibleProperty().bind(errorLabel.textProperty().isNotEmpty());
 
         Label successLabel = new Label();
         successLabel.textProperty().bind(model.successMessageProperty());
+        successLabel.getStyleClass().add("success-message");
         successLabel.managedProperty().bind(successLabel.textProperty().isNotEmpty());
         successLabel.visibleProperty().bind(successLabel.textProperty().isNotEmpty());
 

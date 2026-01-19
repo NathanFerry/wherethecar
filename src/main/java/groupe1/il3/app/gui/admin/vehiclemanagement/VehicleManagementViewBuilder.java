@@ -3,6 +3,7 @@ package groupe1.il3.app.gui.admin.vehiclemanagement;
 import groupe1.il3.app.domain.vehicle.Energy;
 import groupe1.il3.app.domain.vehicle.Status;
 import groupe1.il3.app.domain.vehicle.Vehicle;
+import groupe1.il3.app.gui.style.StyleApplier;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -72,17 +73,30 @@ public class VehicleManagementViewBuilder implements Builder<Region> {
 
         VBox.setVgrow(vehicleListView, Priority.ALWAYS);
 
-        HBox buttonBox = new HBox(10);
+        VBox buttonBox = new VBox(5);
+        buttonBox.getStyleClass().add("admin-button-box");
+
         Button addBtn = new Button("Ajouter");
+        addBtn.getStyleClass().add("admin-add-button");
         addBtn.setOnAction(e -> showAddVehicleDialog());
+        addBtn.setMaxWidth(Double.MAX_VALUE);
+
         Button editBtn = new Button("Modifier");
+        editBtn.getStyleClass().add("admin-edit-button");
         editBtn.setOnAction(e -> showEditVehicleDialog());
         editBtn.disableProperty().bind(model.selectedVehicleProperty().isNull());
+        editBtn.setMaxWidth(Double.MAX_VALUE);
+
         Button deleteBtn = new Button("Supprimer");
+        deleteBtn.getStyleClass().add("admin-delete-button");
         deleteBtn.setOnAction(e -> confirmDeleteVehicle());
         deleteBtn.disableProperty().bind(model.selectedVehicleProperty().isNull());
+        deleteBtn.setMaxWidth(Double.MAX_VALUE);
+
         Button refreshBtn = new Button("Actualiser");
+        refreshBtn.getStyleClass().add("admin-refresh-button");
         refreshBtn.setOnAction(e -> loadVehiclesAction.run());
+        refreshBtn.setMaxWidth(Double.MAX_VALUE);
 
         buttonBox.getChildren().addAll(addBtn, editBtn, deleteBtn, refreshBtn);
 
@@ -146,8 +160,9 @@ public class VehicleManagementViewBuilder implements Builder<Region> {
 
     private void addDetailRow(GridPane grid, int row, String label, String value) {
         Label labelNode = new Label(label);
-        labelNode.setStyle("-fx-font-weight: bold;");
+        labelNode.getStyleClass().add("admin-detail-label");
         Label valueNode = new Label(value);
+        valueNode.getStyleClass().add("admin-detail-value");
 
         grid.add(labelNode, 0, row);
         grid.add(valueNode, 1, row);
@@ -180,6 +195,8 @@ public class VehicleManagementViewBuilder implements Builder<Region> {
         dialog.setTitle("Ajouter un véhicule");
         dialog.setHeaderText("Saisir les informations du véhicule");
 
+        StyleApplier.applyStylesheets(dialog);
+
         ButtonType addButtonType = new ButtonType("Ajouter", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(addButtonType, ButtonType.CANCEL);
 
@@ -205,6 +222,8 @@ public class VehicleManagementViewBuilder implements Builder<Region> {
         Dialog<Vehicle> dialog = new Dialog<>();
         dialog.setTitle("Modifier un véhicule");
         dialog.setHeaderText("Modifier les informations du véhicule");
+
+        StyleApplier.applyStylesheets(dialog);
 
         ButtonType saveButtonType = new ButtonType("Enregistrer", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(saveButtonType, ButtonType.CANCEL);
@@ -390,7 +409,8 @@ public class VehicleManagementViewBuilder implements Builder<Region> {
         if (selected == null) return;
 
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Confirmation de suppression");
+        StyleApplier.applyStylesheets(alert);
+        alert.setTitle("Confirmer la suppression");
         alert.setHeaderText("Supprimer le véhicule");
         alert.setContentText("Êtes-vous sûr de vouloir supprimer ce véhicule ?\n\n" +
                            selected.getManufacturer() + " " + selected.getModel() +

@@ -68,17 +68,18 @@ public class AdminPanelViewBuilder implements Builder<Region> {
     private VBox createMessageBox() {
         VBox messageBox = new VBox(5);
         messageBox.setPadding(new Insets(10));
+        messageBox.getStyleClass().add("admin-message-box");
 
         Label errorLabel = new Label();
         errorLabel.textProperty().bind(model.errorMessageProperty());
-        errorLabel.setStyle("-fx-text-fill: red; -fx-font-weight: bold;");
+        errorLabel.getStyleClass().add("admin-error-label");
         errorLabel.setWrapText(true);
         errorLabel.managedProperty().bind(errorLabel.textProperty().isNotEmpty());
         errorLabel.visibleProperty().bind(errorLabel.textProperty().isNotEmpty());
 
         Label successLabel = new Label();
         successLabel.textProperty().bind(model.successMessageProperty());
-        successLabel.setStyle("-fx-text-fill: green; -fx-font-weight: bold;");
+        successLabel.getStyleClass().add("admin-success-label");
         successLabel.setWrapText(true);
         successLabel.managedProperty().bind(successLabel.textProperty().isNotEmpty());
         successLabel.visibleProperty().bind(successLabel.textProperty().isNotEmpty());

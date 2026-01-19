@@ -4,17 +4,8 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HexFormat;
 
-/**
- * Utility class for password hashing operations.
- */
 public class PasswordHasher {
 
-    /**
-     * Hashes a password using SHA-256.
-     *
-     * @param password the plain text password
-     * @return the hashed password in hexadecimal format
-     */
     public static String hashPassword(String password) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");

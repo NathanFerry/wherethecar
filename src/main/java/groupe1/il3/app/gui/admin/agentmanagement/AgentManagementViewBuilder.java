@@ -1,6 +1,7 @@
 package groupe1.il3.app.gui.admin.agentmanagement;
 
 import groupe1.il3.app.domain.agent.Agent;
+import groupe1.il3.app.gui.style.StyleApplier;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -71,17 +72,30 @@ public class AgentManagementViewBuilder implements Builder<Region> {
 
         VBox.setVgrow(agentListView, Priority.ALWAYS);
 
-        HBox buttonBox = new HBox(10);
+        VBox buttonBox = new VBox(5);
+        buttonBox.getStyleClass().add("admin-button-box");
+
         Button addBtn = new Button("Ajouter");
+        addBtn.getStyleClass().add("admin-add-button");
         addBtn.setOnAction(e -> showAddAgentDialog());
+        addBtn.setMaxWidth(Double.MAX_VALUE);
+
         Button editBtn = new Button("Modifier");
+        editBtn.getStyleClass().add("admin-edit-button");
         editBtn.setOnAction(e -> showEditAgentDialog());
         editBtn.disableProperty().bind(model.selectedAgentProperty().isNull());
+        editBtn.setMaxWidth(Double.MAX_VALUE);
+
         Button deleteBtn = new Button("Supprimer");
+        deleteBtn.getStyleClass().add("admin-delete-button");
         deleteBtn.setOnAction(e -> confirmDeleteAgent());
         deleteBtn.disableProperty().bind(model.selectedAgentProperty().isNull());
+        deleteBtn.setMaxWidth(Double.MAX_VALUE);
+
         Button refreshBtn = new Button("Actualiser");
+        refreshBtn.getStyleClass().add("admin-refresh-button");
         refreshBtn.setOnAction(e -> loadAgentsAction.run());
+        refreshBtn.setMaxWidth(Double.MAX_VALUE);
 
         buttonBox.getChildren().addAll(addBtn, editBtn, deleteBtn, refreshBtn);
 
@@ -135,8 +149,9 @@ public class AgentManagementViewBuilder implements Builder<Region> {
 
     private void addDetailRow(GridPane grid, int row, String label, String value) {
         Label labelNode = new Label(label);
-        labelNode.setStyle("-fx-font-weight: bold;");
+        labelNode.getStyleClass().add("admin-detail-label");
         Label valueNode = new Label(value);
+        valueNode.getStyleClass().add("admin-detail-value");
 
         grid.add(labelNode, 0, row);
         grid.add(valueNode, 1, row);
@@ -172,6 +187,8 @@ public class AgentManagementViewBuilder implements Builder<Region> {
         Dialog<Agent> dialog = new Dialog<>();
         dialog.setTitle("Modifier un utilisateur");
         dialog.setHeaderText("Modifier les informations de l'utilisateur");
+
+        StyleApplier.applyStylesheets(dialog);
 
         ButtonType saveButtonType = new ButtonType("Enregistrer", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(saveButtonType, ButtonType.CANCEL);
@@ -284,6 +301,7 @@ public class AgentManagementViewBuilder implements Builder<Region> {
         if (selected == null) return;
 
         Alert alert = new Alert(Alert.AlertType.WARNING);
+        StyleApplier.applyStylesheets(alert);
         alert.setTitle("Confirmation de suppression");
         alert.setHeaderText("Supprimer l'utilisateur");
         alert.setContentText("⚠️ ATTENTION ⚠️\n\n" +
