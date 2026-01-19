@@ -10,6 +10,8 @@ import javafx.util.Builder;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.HexFormat;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -271,8 +273,8 @@ public class AgentManagementViewBuilder implements Builder<Region> {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
             byte[] hash = md.digest(password.getBytes(StandardCharsets.UTF_8));
-            return java.util.HexFormat.of().formatHex(hash);
-        } catch (java.security.NoSuchAlgorithmException e) {
+            return HexFormat.of().formatHex(hash);
+        } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException("Failed to hash password", e);
         }
     }

@@ -5,6 +5,7 @@ import groupe1.il3.app.domain.vehicle.Status;
 import groupe1.il3.app.domain.vehicle.Vehicle;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.util.Builder;
@@ -315,7 +316,7 @@ public class VehicleManagementViewBuilder implements Builder<Region> {
         LocalDateTime acquisitionDate = LocalDateTime.now();
         Status status = Status.AVAILABLE;
 
-        for (javafx.scene.Node node : grid.getChildren()) {
+        for (Node node : grid.getChildren()) {
             Object userData = node.getUserData();
             if (userData == null) continue;
 

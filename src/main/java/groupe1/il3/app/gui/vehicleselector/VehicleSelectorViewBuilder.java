@@ -1,6 +1,7 @@
 package groupe1.il3.app.gui.vehicleselector;
 
 import groupe1.il3.app.domain.vehicle.Vehicle;
+import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -101,7 +102,7 @@ public class VehicleSelectorViewBuilder implements Builder<Region> {
         reserveButton.disableProperty().bind(
             model.selectedVehicleProperty().isNull().or(
                 model.selectedVehicleProperty().isNotNull().and(
-                    javafx.beans.binding.Bindings.createBooleanBinding(
+                    Bindings.createBooleanBinding(
                         () -> {
                             Vehicle v = model.getSelectedVehicle();
                             return v != null && !"AVAILABLE".equals(v.getStatus().toString());

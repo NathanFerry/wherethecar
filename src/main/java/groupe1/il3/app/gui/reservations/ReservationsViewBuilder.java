@@ -8,6 +8,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.util.Builder;
 
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class ReservationsViewBuilder implements Builder<Region> {
@@ -266,7 +267,7 @@ public class ReservationsViewBuilder implements Builder<Region> {
         grid.add(valueNode, 1, row);
     }
 
-    private String formatDateTime(java.time.LocalDateTime dateTime) {
+    private String formatDateTime(LocalDateTime dateTime) {
         if (dateTime == null) {
             return "N/A";
         }

@@ -96,7 +96,7 @@ public class HeaderViewBuilder implements Builder<Region> {
         ButtonType cancelButtonType = new ButtonType("Annuler", ButtonBar.ButtonData.CANCEL_CLOSE);
         dialog.getDialogPane().getButtonTypes().addAll(saveButtonType, cancelButtonType);
 
-        javafx.scene.control.Button saveButton = (javafx.scene.control.Button) dialog.getDialogPane().lookupButton(saveButtonType);
+        Button saveButton = (Button) dialog.getDialogPane().lookupButton(saveButtonType);
         saveButton.disableProperty().bind(model.updateInProgressProperty());
 
         return dialog;
