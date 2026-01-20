@@ -12,7 +12,8 @@ public class StyleApplier {
         "/styles/navigation.css",
         "/styles/vehicles.css",
         "/styles/reservations.css",
-        "/styles/admin.css"
+        "/styles/admin.css",
+        "/styles/calendar.css"
     };
 
     private StyleApplier() {}

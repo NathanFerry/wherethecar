@@ -55,6 +55,16 @@ public class ReservationBroker {
         reservationDao.createReservation(reservationUuid, agentUuid, vehicleUuid, startDate, endDate, "pending");
     }
 
+    public List<Reservation> getReservationsByVehicleUuid(UUID vehicleUuid) {
+        return reservationDao.getReservationsByVehicleUuid(vehicleUuid).stream()
+                .map(this::convertToReservation)
+                .collect(Collectors.toList());
+    }
+
+    public boolean hasOverlappingReservation(UUID vehicleUuid, LocalDateTime startDate, LocalDateTime endDate) {
+        return reservationDao.hasOverlappingReservation(vehicleUuid, startDate, endDate);
+    }
+
     public void returnVehicle(UUID reservationUuid, UUID vehicleUuid, int newKilometers) {
         reservationDao.updateReservationStatus(reservationUuid, "completed");
 
@@ -88,7 +98,8 @@ public class ReservationBroker {
 
     public void approveReservation(UUID reservationUuid, UUID vehicleUuid) {
         reservationDao.updateReservationStatus(reservationUuid, "confirmed");
-        vehicleBroker.updateVehicleStatus(vehicleUuid, Status.RESERVED);
+        // Note: We no longer set the vehicle status to RESERVED since we support multiple
+        // non-overlapping reservations for the same vehicle
     }
 
     public void cancelReservation(UUID reservationUuid) {

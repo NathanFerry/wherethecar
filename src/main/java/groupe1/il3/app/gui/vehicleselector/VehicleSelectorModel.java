@@ -1,5 +1,6 @@
 package groupe1.il3.app.gui.vehicleselector;
 
+import groupe1.il3.app.domain.reservation.Reservation;
 import groupe1.il3.app.domain.vehicle.Vehicle;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
@@ -14,6 +15,7 @@ import java.time.LocalDateTime;
 public class VehicleSelectorModel {
     private final ListProperty<Vehicle> vehicles = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ObjectProperty<Vehicle> selectedVehicle = new SimpleObjectProperty<>();
+    private final ListProperty<Reservation> selectedVehicleReservations = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ObjectProperty<LocalDateTime> reservationStartDate = new SimpleObjectProperty<>();
     private final ObjectProperty<LocalDateTime> reservationEndDate = new SimpleObjectProperty<>();
     private final StringProperty reservationErrorMessage = new SimpleStringProperty("");
@@ -32,6 +34,10 @@ public class VehicleSelectorModel {
 
     public void setSelectedVehicle(Vehicle vehicle) {
         selectedVehicle.set(vehicle);
+    }
+
+    public ListProperty<Reservation> selectedVehicleReservationsProperty() {
+        return selectedVehicleReservations;
     }
 
     public ObjectProperty<LocalDateTime> reservationStartDateProperty() {
