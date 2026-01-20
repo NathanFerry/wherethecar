@@ -11,6 +11,8 @@ public interface ReservationDao {
     public List<ReservationDto> getAllReservations();
     public List<ReservationDto> getActiveReservationsByAgentUuid(UUID agentUuid);
     public List<ReservationDto> getHistoricalReservationsByAgentUuid(UUID agentUuid);
+    public List<ReservationDto> getReservationsByVehicleUuid(UUID vehicleUuid);
+    public boolean hasOverlappingReservation(UUID vehicleUuid, LocalDateTime startDate, LocalDateTime endDate);
     public void createReservation(UUID uuid, UUID agentUuid, UUID vehicleUuid, LocalDateTime startDate, LocalDateTime endDate, String status);
     public void updateReservationStatus(UUID reservationUuid, String status);
 }

@@ -1,0 +1,165 @@
+.calendar-container {
+    -fx-background-color: -fx-bg-white;
+    -fx-border-color: -fx-border-default;
+    -fx-border-width: 1px;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-padding: 15px;
+    -fx-spacing: 10px;
+}
+
+.calendar-title {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-text-primary;
+}
+
+.calendar-month-navigation {
+    -fx-spacing: 10px;
+    -fx-alignment: center;
+}
+
+.calendar-month-label {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-text-primary;
+    -fx-min-width: 150px;
+    -fx-alignment: center;
+}
+
+.calendar-nav-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: -fx-color-primary;
+    -fx-border-color: -fx-color-primary;
+    -fx-border-width: 1px;
+    -fx-border-radius: 3px;
+    -fx-background-radius: 3px;
+    -fx-padding: 5px 10px;
+    -fx-cursor: hand;
+}
+
+.calendar-nav-button:hover {
+    -fx-background-color: -fx-bg-hover;
+}
+
+.calendar-grid {
+    -fx-hgap: 5px;
+    -fx-vgap: 5px;
+    -fx-padding: 10px 0;
+}
+
+.calendar-day-header {
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-text-secondary;
+    -fx-alignment: center;
+    -fx-padding: 5px;
+}
+
+.calendar-day-cell {
+    -fx-min-width: 40px;
+    -fx-min-height: 40px;
+    -fx-max-width: 40px;
+    -fx-max-height: 40px;
+    -fx-alignment: center;
+    -fx-background-radius: 3px;
+    -fx-border-radius: 3px;
+    -fx-font-size: 12px;
+}
+
+.calendar-day-available {
+    -fx-background-color: #E8F5E9;
+    -fx-border-color: #4CAF50;
+    -fx-border-width: 1px;
+    -fx-text-fill: #2E7D32;
+}
+
+.calendar-day-reserved {
+    -fx-background-color: #FFEBEE;
+    -fx-border-color: #F44336;
+    -fx-border-width: 1px;
+    -fx-text-fill: #C62828;
+}
+
+.calendar-day-other-month {
+    -fx-background-color: transparent;
+    -fx-text-fill: -fx-text-disabled;
+}
+
+.calendar-day-today {
+    -fx-font-weight: bold;
+    -fx-border-width: 2px;
+}
+
+.calendar-legend {
+    -fx-spacing: 15px;
+    -fx-padding: 10px 0;
+}
+
+.calendar-legend-item {
+    -fx-spacing: 5px;
+    -fx-alignment: center-left;
+}
+
+.calendar-legend-box {
+    -fx-min-width: 20px;
+    -fx-min-height: 20px;
+    -fx-max-width: 20px;
+    -fx-max-height: 20px;
+    -fx-border-radius: 3px;
+    -fx-background-radius: 3px;
+}
+
+.calendar-legend-box-available {
+    -fx-background-color: #E8F5E9;
+    -fx-border-color: #4CAF50;
+    -fx-border-width: 1px;
+}
+
+.calendar-legend-box-reserved {
+    -fx-background-color: #FFEBEE;
+    -fx-border-color: #F44336;
+    -fx-border-width: 1px;
+}
+
+.calendar-legend-label {
+    -fx-font-size: 12px;
+    -fx-text-fill: -fx-text-secondary;
+}
+
+.reservation-list-container {
+    -fx-background-color: -fx-bg-secondary;
+    -fx-border-color: -fx-border-default;
+    -fx-border-width: 1px;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-padding: 10px;
+    -fx-spacing: 5px;
+    -fx-max-height: 200px;
+}
+
+.reservation-list-title {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-text-primary;
+}
+
+.reservation-item {
+    -fx-background-color: -fx-bg-white;
+    -fx-border-color: -fx-border-default;
+    -fx-border-width: 1px;
+    -fx-border-radius: 3px;
+    -fx-background-radius: 3px;
+    -fx-padding: 8px;
+    -fx-spacing: 3px;
+}
+
+.reservation-item-date {
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-text-primary;
+}
+
+.reservation-item-status {
+    -fx-font-size: 10px;
+}

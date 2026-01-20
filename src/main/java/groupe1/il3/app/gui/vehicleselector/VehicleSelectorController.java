@@ -1,6 +1,7 @@
 package groupe1.il3.app.gui.vehicleselector;
 
 import groupe1.il3.app.domain.authentication.SessionManager;
+import groupe1.il3.app.domain.reservation.Reservation;
 import groupe1.il3.app.domain.vehicle.Vehicle;
 import javafx.concurrent.Task;
 import javafx.scene.layout.Region;
@@ -16,7 +17,7 @@ public class VehicleSelectorController {
     public VehicleSelectorController() {
         this.model = new VehicleSelectorModel();
         this.interactor = new VehicleSelectorInteractor();
-        this.viewBuilder = new VehicleSelectorViewBuilder(model, this::loadVehicles, this::reserveVehicle);
+        this.viewBuilder = new VehicleSelectorViewBuilder(model, this::loadVehicles, this::reserveVehicle, this::loadVehicleReservations);
     }
 
     public Region getView() {
@@ -39,8 +40,30 @@ public class VehicleSelectorController {
         new Thread(task).start();
     }
 
+    private void loadVehicleReservations() {
+        if (model.getSelectedVehicle() == null) {
+            model.selectedVehicleReservationsProperty().clear();
+            return;
+        }
+
+        Task<List<Reservation>> task = interactor.createLoadVehicleReservationsTask(model.getSelectedVehicle().uuid());
+
+        task.setOnSucceeded(event -> {
+            model.selectedVehicleReservationsProperty().clear();
+            model.selectedVehicleReservationsProperty().addAll(task.getValue());
+        });
+
+        task.setOnFailed(event -> {
+            System.err.println("Failed to load vehicle reservations: " + task.getException().getMessage());
+            task.getException().printStackTrace();
+        });
+
+        new Thread(task).start();
+    }
+
     private void reserveVehicle() {
         model.setReservationErrorMessage("");
+        model.setReservationSuccessful(false);
 
         if (model.getSelectedVehicle() == null) {
             model.setReservationErrorMessage("Veuillez sélectionner un véhicule");
@@ -67,14 +90,18 @@ public class VehicleSelectorController {
         task.setOnSucceeded(event -> {
             if (task.getValue()) {
                 model.setReservationErrorMessage("");
-                loadVehicles(); // Reload vehicles to update status
+                model.setReservationSuccessful(true);
+                loadVehicles();
+                loadVehicleReservations(); // Reload reservations to show the new one
             } else {
                 model.setReservationErrorMessage("Ce véhicule est déjà réservé pour cette période");
+                model.setReservationSuccessful(false);
             }
         });
 
         task.setOnFailed(event -> {
             model.setReservationErrorMessage("Erreur lors de la création de la réservation");
+            model.setReservationSuccessful(false);
             System.err.println("Failed to create reservation: " + task.getException().getMessage());
             task.getException().printStackTrace();
         });

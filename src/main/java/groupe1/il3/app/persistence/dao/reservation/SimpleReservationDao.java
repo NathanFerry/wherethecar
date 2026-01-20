@@ -198,4 +198,65 @@ public class SimpleReservationDao implements ReservationDao {
             throw new RuntimeException("Database connection error while updating reservation status", e);
         }
     }
+
+    @Override
+    public List<ReservationDto> getReservationsByVehicleUuid(UUID vehicleUuid) {
+        String query = "SELECT uuid, agent_uuid, vehicle_uuid, start_date, end_date, status " +
+                       "FROM reservation WHERE vehicle_uuid = ? AND status IN ('pending', 'confirmed') " +
+                       "ORDER BY start_date ASC";
+
+        List<ReservationDto> reservations = new ArrayList<>();
+
+        try {
+
+            Connection conn = connectionManager.getNewConnection();
+            PreparedStatement stmt = conn.prepareStatement(query);
+
+            stmt.setObject(1, vehicleUuid);
+
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                reservations.add(mapResultSetToReservationDto(rs));
+            }
+
+            return reservations;
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to retrieve reservations for vehicle: " + vehicleUuid, e);
+        } catch (DatabaseException e) {
+            throw new RuntimeException("Database connection error while retrieving vehicle reservations", e);
+        }
+    }
+
+    @Override
+    public boolean hasOverlappingReservation(UUID vehicleUuid, LocalDateTime startDate, LocalDateTime endDate) {
+
+        String query = "SELECT COUNT(*) FROM reservation " +
+                       "WHERE vehicle_uuid = ? " +
+                       "AND status IN ('pending', 'confirmed') " +
+                       "AND start_date < ? " +
+                       "AND end_date > ?";
+
+        try {
+
+            Connection conn = connectionManager.getNewConnection();
+            PreparedStatement stmt = conn.prepareStatement(query);
+
+            stmt.setObject(1, vehicleUuid);
+            stmt.setTimestamp(2, Timestamp.valueOf(endDate));
+            stmt.setTimestamp(3, Timestamp.valueOf(startDate));
+
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+
+            return false;
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to check for overlapping reservations", e);
+        } catch (DatabaseException e) {
+            throw new RuntimeException("Database connection error while checking overlapping reservations", e);
+        }
+    }
 }
