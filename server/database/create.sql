@@ -6,7 +6,7 @@ exception
 end $$;
 
 do $$ begin
-    create type vehicle_status as enum ('available', 'reserved', 'in_maintenance');
+    create type vehicle_status as enum ('available', 'reserved', 'maintenance');
 exception
     when duplicate_object then null;
 end $$;
