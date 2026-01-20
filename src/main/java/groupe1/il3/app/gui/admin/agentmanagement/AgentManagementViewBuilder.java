@@ -60,8 +60,8 @@ public class AgentManagementViewBuilder implements Builder<Region> {
                     setText(null);
                 } else {
                     String adminLabel = agent.isAdmin() ? " [ADMIN]" : "";
-                    setText(agent.getFirstname() + " " + agent.getLastname() +
-                           " (" + agent.getEmail() + ")" + adminLabel);
+                    setText(agent.firstname() + " " + agent.lastname() +
+                           " (" + agent.email() + ")" + adminLabel);
                 }
             }
         });
@@ -127,12 +127,12 @@ public class AgentManagementViewBuilder implements Builder<Region> {
         model.selectedAgentProperty().addListener((obs, oldVal, newVal) -> {
             detailsGrid.getChildren().clear();
             if (newVal != null) {
-                titleLabel.setText(newVal.getFirstname() + " " + newVal.getLastname());
+                titleLabel.setText(newVal.firstname() + " " + newVal.lastname());
 
-                addDetailRow(detailsGrid, 0, "UUID:", newVal.getUuid().toString());
-                addDetailRow(detailsGrid, 1, "Prénom:", newVal.getFirstname());
-                addDetailRow(detailsGrid, 2, "Nom:", newVal.getLastname());
-                addDetailRow(detailsGrid, 3, "Email:", newVal.getEmail());
+                addDetailRow(detailsGrid, 0, "UUID:", newVal.uuid().toString());
+                addDetailRow(detailsGrid, 1, "Prénom:", newVal.firstname());
+                addDetailRow(detailsGrid, 2, "Nom:", newVal.lastname());
+                addDetailRow(detailsGrid, 3, "Email:", newVal.email());
                 addDetailRow(detailsGrid, 4, "Administrateur:", newVal.isAdmin() ? "Oui" : "Non");
             }
         });
@@ -199,7 +199,7 @@ public class AgentManagementViewBuilder implements Builder<Region> {
 
         dialog.setResultConverter(dialogButton -> {
             if (dialogButton == saveButtonType) {
-                return extractAgentFromForm(grid, selected.getUuid());
+                return extractAgentFromForm(grid, selected.uuid());
             }
             return null;
         });
@@ -216,17 +216,17 @@ public class AgentManagementViewBuilder implements Builder<Region> {
 
         int row = 0;
 
-        TextField firstNameField = new TextField(agent != null ? agent.getFirstname() : "");
+        TextField firstNameField = new TextField(agent != null ? agent.firstname() : "");
         grid.add(new Label("Prénom:"), 0, row);
         grid.add(firstNameField, 1, row++);
         firstNameField.setUserData("firstName");
 
-        TextField lastNameField = new TextField(agent != null ? agent.getLastname() : "");
+        TextField lastNameField = new TextField(agent != null ? agent.lastname() : "");
         grid.add(new Label("Nom:"), 0, row);
         grid.add(lastNameField, 1, row++);
         lastNameField.setUserData("lastName");
 
-        TextField emailField = new TextField(agent != null ? agent.getEmail() : "");
+        TextField emailField = new TextField(agent != null ? agent.email() : "");
         grid.add(new Label("Email:"), 0, row);
         grid.add(emailField, 1, row++);
         emailField.setUserData("email");
@@ -278,7 +278,7 @@ public class AgentManagementViewBuilder implements Builder<Region> {
 
         String passwordHash;
         if (password.isEmpty() && model.getSelectedAgent() != null) {
-            passwordHash = model.getSelectedAgent().getPasswordHash();
+            passwordHash = model.getSelectedAgent().passwordHash();
         } else {
             passwordHash = hashPassword(password);
         }
@@ -306,8 +306,8 @@ public class AgentManagementViewBuilder implements Builder<Region> {
         alert.setHeaderText("Supprimer l'utilisateur");
         alert.setContentText("⚠️ ATTENTION ⚠️\n\n" +
                            "Vous êtes sur le point de supprimer l'utilisateur :\n" +
-                           selected.getFirstname() + " " + selected.getLastname() +
-                           " (" + selected.getEmail() + ")\n\n" +
+                           selected.firstname() + " " + selected.lastname() +
+                           " (" + selected.email() + ")\n\n" +
                            "TOUTES les données associées à cet utilisateur seront perdues " +
                            "(réservations, etc.).\n\n" +
                            "Cette action est IRRÉVERSIBLE.\n\n" +
@@ -315,7 +315,7 @@ public class AgentManagementViewBuilder implements Builder<Region> {
 
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
-            deleteAgentAction.accept(selected.getUuid());
+            deleteAgentAction.accept(selected.uuid());
         }
     }
 }

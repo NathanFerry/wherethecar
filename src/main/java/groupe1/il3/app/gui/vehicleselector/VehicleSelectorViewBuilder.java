@@ -110,7 +110,7 @@ public class VehicleSelectorViewBuilder implements Builder<Region> {
                     Bindings.createBooleanBinding(
                         () -> {
                             Vehicle v = model.getSelectedVehicle();
-                            return v != null && !"AVAILABLE".equals(v.getStatus().toString());
+                            return v != null && !"AVAILABLE".equals(v.status().toString());
                         },
                         model.selectedVehicleProperty()
                     )
@@ -121,22 +121,22 @@ public class VehicleSelectorViewBuilder implements Builder<Region> {
         model.selectedVehicleProperty().addListener((obs, oldVal, newVal) -> {
             detailsGrid.getChildren().clear();
             if (newVal != null) {
-                titleLabel.setText(newVal.getManufacturer() + " " + newVal.getModel());
+                titleLabel.setText(newVal.manufacturer() + " " + newVal.model());
 
-                addDetailRow(detailsGrid, 0, "Plaque d'immatriculation:", newVal.getLicencePlate());
-                addDetailRow(detailsGrid, 1, "Constructeur:", newVal.getManufacturer());
-                addDetailRow(detailsGrid, 2, "Modèle:", newVal.getModel());
-                addDetailRow(detailsGrid, 3, "Énergie:", formatEnergy(newVal.getEnergy().toString()));
-                addDetailRow(detailsGrid, 4, "Puissance:", newVal.getPower() + " CV");
-                addDetailRow(detailsGrid, 5, "Sièges:", String.valueOf(newVal.getSeats()));
-                addDetailRow(detailsGrid, 6, "Capacité:", newVal.getCapacity() + " L");
-                addDetailRow(detailsGrid, 7, "Poids utilitaire:", newVal.getUtilityWeight() + " kg");
-                addDetailRow(detailsGrid, 8, "Couleur:", newVal.getColor());
-                addDetailRow(detailsGrid, 9, "Kilométrage:", newVal.getKilometers() + " km");
+                addDetailRow(detailsGrid, 0, "Plaque d'immatriculation:", newVal.licencePlate());
+                addDetailRow(detailsGrid, 1, "Constructeur:", newVal.manufacturer());
+                addDetailRow(detailsGrid, 2, "Modèle:", newVal.model());
+                addDetailRow(detailsGrid, 3, "Énergie:", formatEnergy(newVal.energy().toString()));
+                addDetailRow(detailsGrid, 4, "Puissance:", newVal.power() + " CV");
+                addDetailRow(detailsGrid, 5, "Sièges:", String.valueOf(newVal.seats()));
+                addDetailRow(detailsGrid, 6, "Capacité:", newVal.capacity() + " L");
+                addDetailRow(detailsGrid, 7, "Poids utilitaire:", newVal.utilityWeight() + " kg");
+                addDetailRow(detailsGrid, 8, "Couleur:", newVal.color());
+                addDetailRow(detailsGrid, 9, "Kilométrage:", newVal.kilometers() + " km");
                 addDetailRow(detailsGrid, 10, "Date d'acquisition:",
-                    newVal.getAcquisitionDate() != null ?
-                    newVal.getAcquisitionDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) : "N/A");
-                addDetailRow(detailsGrid, 11, "Statut:", formatStatus(newVal.getStatus().toString()));
+                    newVal.acquisitionDate() != null ?
+                    newVal.acquisitionDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) : "N/A");
+                addDetailRow(detailsGrid, 11, "Statut:", formatStatus(newVal.status().toString()));
             }
         });
 
@@ -179,7 +179,7 @@ public class VehicleSelectorViewBuilder implements Builder<Region> {
     private void showReservationDialog() {
         Dialog<ButtonType> dialog = new Dialog<>();
         dialog.setTitle("Réserver un véhicule");
-        dialog.setHeaderText("Réservation de " + model.getSelectedVehicle().getManufacturer() + " " + model.getSelectedVehicle().getModel());
+        dialog.setHeaderText("Réservation de " + model.getSelectedVehicle().manufacturer() + " " + model.getSelectedVehicle().model());
 
         StyleApplier.applyStylesheets(dialog);
 
@@ -279,14 +279,14 @@ public class VehicleSelectorViewBuilder implements Builder<Region> {
                 VBox content = new VBox(3);
                 content.getStyleClass().add("vehicle-list-cell");
 
-                Label titleLabel = new Label(vehicle.getManufacturer() + " " + vehicle.getModel());
+                Label titleLabel = new Label(vehicle.manufacturer() + " " + vehicle.model());
                 titleLabel.getStyleClass().add("vehicle-manufacturer");
 
-                Label plateLabel = new Label(vehicle.getLicencePlate());
+                Label plateLabel = new Label(vehicle.licencePlate());
                 plateLabel.getStyleClass().add("vehicle-license-plate");
 
-                Label statusLabel = new Label(formatStatusForCell(vehicle.getStatus().toString()));
-                String statusClass = switch (vehicle.getStatus().toString()) {
+                Label statusLabel = new Label(formatStatusForCell(vehicle.status().toString()));
+                String statusClass = switch (vehicle.status().toString()) {
                     case "AVAILABLE" -> "vehicle-status-available";
                     case "RESERVED" -> "vehicle-status-reserved";
                     case "MAINTENANCE" -> "vehicle-status-maintenance";

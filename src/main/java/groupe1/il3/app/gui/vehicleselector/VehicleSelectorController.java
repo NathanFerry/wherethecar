@@ -58,8 +58,8 @@ public class VehicleSelectorController {
         }
 
         Task<Boolean> task = interactor.createReservationTask(
-            SessionManager.getInstance().getCurrentAgent().getUuid(),
-            model.getSelectedVehicle().getUuid(),
+            SessionManager.getInstance().getCurrentAgent().uuid(),
+            model.getSelectedVehicle().uuid(),
             model.getReservationStartDate(),
             model.getReservationEndDate()
         );

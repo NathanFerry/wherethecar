@@ -33,7 +33,7 @@ public class ReservationsController {
         }
 
         model.setLoading(true);
-        Task<List<Reservation>> task = interactor.createLoadReservationsTask(currentAgent.getUuid());
+        Task<List<Reservation>> task = interactor.createLoadReservationsTask(currentAgent.uuid());
 
         task.setOnSucceeded(event -> {
             model.setLoading(false);
@@ -59,12 +59,12 @@ public class ReservationsController {
             return;
         }
 
-        if (selectedReservation.getVehicle() == null) {
+        if (selectedReservation.vehicle() == null) {
             model.setReturnErrorMessage("Véhicule non disponible");
             return;
         }
 
-        int currentKilometers = selectedReservation.getVehicle().getKilometers();
+        int currentKilometers = selectedReservation.vehicle().kilometers();
         int newKilometers = model.getNewKilometers();
 
         if (newKilometers < currentKilometers) {
@@ -73,8 +73,8 @@ public class ReservationsController {
         }
 
         Task<Void> task = interactor.createReturnVehicleTask(
-            selectedReservation.getUuid(),
-            selectedReservation.getVehicle().getUuid(),
+            selectedReservation.uuid(),
+            selectedReservation.vehicle().uuid(),
             newKilometers
         );
 

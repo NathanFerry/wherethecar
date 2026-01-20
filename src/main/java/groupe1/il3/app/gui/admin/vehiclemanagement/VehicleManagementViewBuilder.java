@@ -67,8 +67,8 @@ public class VehicleManagementViewBuilder implements Builder<Region> {
                 if (empty || vehicle == null) {
                     setText(null);
                 } else {
-                    setText(vehicle.getManufacturer() + " " + vehicle.getModel() +
-                           " (" + vehicle.getLicencePlate() + ")");
+                    setText(vehicle.manufacturer() + " " + vehicle.model() +
+                           " (" + vehicle.licencePlate() + ")");
                 }
             }
         });
@@ -149,27 +149,27 @@ public class VehicleManagementViewBuilder implements Builder<Region> {
             maintenanceBox.getChildren().clear();
 
             if (newVal != null) {
-                titleLabel.setText(newVal.getManufacturer() + " " + newVal.getModel());
+                titleLabel.setText(newVal.manufacturer() + " " + newVal.model());
 
-                addDetailRow(detailsGrid, 0, "UUID:", newVal.getUuid().toString());
-                addDetailRow(detailsGrid, 1, "Plaque:", newVal.getLicencePlate());
-                addDetailRow(detailsGrid, 2, "Constructeur:", newVal.getManufacturer());
-                addDetailRow(detailsGrid, 3, "Modèle:", newVal.getModel());
-                addDetailRow(detailsGrid, 4, "Énergie:", formatEnergy(newVal.getEnergy()));
-                addDetailRow(detailsGrid, 5, "Puissance:", newVal.getPower() + " CV");
-                addDetailRow(detailsGrid, 6, "Sièges:", String.valueOf(newVal.getSeats()));
-                addDetailRow(detailsGrid, 7, "Capacité:", newVal.getCapacity() + " L");
-                addDetailRow(detailsGrid, 8, "Poids utilitaire:", newVal.getUtilityWeight() + " kg");
-                addDetailRow(detailsGrid, 9, "Couleur:", newVal.getColor());
-                addDetailRow(detailsGrid, 10, "Kilométrage:", newVal.getKilometers() + " km");
+                addDetailRow(detailsGrid, 0, "UUID:", newVal.uuid().toString());
+                addDetailRow(detailsGrid, 1, "Plaque:", newVal.licencePlate());
+                addDetailRow(detailsGrid, 2, "Constructeur:", newVal.manufacturer());
+                addDetailRow(detailsGrid, 3, "Modèle:", newVal.model());
+                addDetailRow(detailsGrid, 4, "Énergie:", formatEnergy(newVal.energy()));
+                addDetailRow(detailsGrid, 5, "Puissance:", newVal.power() + " CV");
+                addDetailRow(detailsGrid, 6, "Sièges:", String.valueOf(newVal.seats()));
+                addDetailRow(detailsGrid, 7, "Capacité:", newVal.capacity() + " L");
+                addDetailRow(detailsGrid, 8, "Poids utilitaire:", newVal.utilityWeight() + " kg");
+                addDetailRow(detailsGrid, 9, "Couleur:", newVal.color());
+                addDetailRow(detailsGrid, 10, "Kilométrage:", newVal.kilometers() + " km");
                 addDetailRow(detailsGrid, 11, "Date d'acquisition:",
-                    newVal.getAcquisitionDate() != null ?
-                    newVal.getAcquisitionDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) : "N/A");
-                addDetailRow(detailsGrid, 12, "Statut:", formatStatus(newVal.getStatus()));
+                    newVal.acquisitionDate() != null ?
+                    newVal.acquisitionDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) : "N/A");
+                addDetailRow(detailsGrid, 12, "Statut:", formatStatus(newVal.status()));
 
                 // Initialize maintenance controller for the selected vehicle
                 maintenanceController = new MaintenanceManagementController(
-                    newVal.getUuid(),
+                    newVal.uuid(),
                     messageHandler
                 );
                 maintenanceBox.getChildren().add(maintenanceController.getView());
@@ -265,7 +265,7 @@ public class VehicleManagementViewBuilder implements Builder<Region> {
 
         dialog.setResultConverter(dialogButton -> {
             if (dialogButton == saveButtonType) {
-                return extractVehicleFromForm(grid, selected.getUuid());
+                return extractVehicleFromForm(grid, selected.uuid());
             }
             return null;
         });
@@ -282,61 +282,61 @@ public class VehicleManagementViewBuilder implements Builder<Region> {
 
         int row = 0;
 
-        TextField licensePlateField = new TextField(vehicle != null ? vehicle.getLicencePlate() : "");
+        TextField licensePlateField = new TextField(vehicle != null ? vehicle.licencePlate() : "");
         grid.add(new Label("Plaque d'immatriculation:"), 0, row);
         grid.add(licensePlateField, 1, row++);
         licensePlateField.setUserData("licensePlate");
 
-        TextField manufacturerField = new TextField(vehicle != null ? vehicle.getManufacturer() : "");
+        TextField manufacturerField = new TextField(vehicle != null ? vehicle.manufacturer() : "");
         grid.add(new Label("Constructeur:"), 0, row);
         grid.add(manufacturerField, 1, row++);
         manufacturerField.setUserData("manufacturer");
 
-        TextField modelField = new TextField(vehicle != null ? vehicle.getModel() : "");
+        TextField modelField = new TextField(vehicle != null ? vehicle.model() : "");
         grid.add(new Label("Modèle:"), 0, row);
         grid.add(modelField, 1, row++);
         modelField.setUserData("model");
 
         ComboBox<Energy> energyCombo = new ComboBox<>();
         energyCombo.getItems().addAll(Energy.values());
-        energyCombo.setValue(vehicle != null ? vehicle.getEnergy() : Energy.NOT_SPECIFIED);
+        energyCombo.setValue(vehicle != null ? vehicle.energy() : Energy.NOT_SPECIFIED);
         grid.add(new Label("Énergie:"), 0, row);
         grid.add(energyCombo, 1, row++);
         energyCombo.setUserData("energy");
 
-        TextField powerField = new TextField(vehicle != null ? String.valueOf(vehicle.getPower()) : "");
+        TextField powerField = new TextField(vehicle != null ? String.valueOf(vehicle.power()) : "");
         grid.add(new Label("Puissance (CV):"), 0, row);
         grid.add(powerField, 1, row++);
         powerField.setUserData("power");
 
-        TextField seatsField = new TextField(vehicle != null ? String.valueOf(vehicle.getSeats()) : "");
+        TextField seatsField = new TextField(vehicle != null ? String.valueOf(vehicle.seats()) : "");
         grid.add(new Label("Nombre de sièges:"), 0, row);
         grid.add(seatsField, 1, row++);
         seatsField.setUserData("seats");
 
-        TextField capacityField = new TextField(vehicle != null ? String.valueOf(vehicle.getCapacity()) : "");
+        TextField capacityField = new TextField(vehicle != null ? String.valueOf(vehicle.capacity()) : "");
         grid.add(new Label("Capacité (L):"), 0, row);
         grid.add(capacityField, 1, row++);
         capacityField.setUserData("capacity");
 
-        TextField utilityWeightField = new TextField(vehicle != null ? String.valueOf(vehicle.getUtilityWeight()) : "");
+        TextField utilityWeightField = new TextField(vehicle != null ? String.valueOf(vehicle.utilityWeight()) : "");
         grid.add(new Label("Poids utilitaire (kg):"), 0, row);
         grid.add(utilityWeightField, 1, row++);
         utilityWeightField.setUserData("utilityWeight");
 
-        TextField colorField = new TextField(vehicle != null ? vehicle.getColor() : "");
+        TextField colorField = new TextField(vehicle != null ? vehicle.color() : "");
         grid.add(new Label("Couleur:"), 0, row);
         grid.add(colorField, 1, row++);
         colorField.setUserData("color");
 
-        TextField kilometersField = new TextField(vehicle != null ? String.valueOf(vehicle.getKilometers()) : "");
+        TextField kilometersField = new TextField(vehicle != null ? String.valueOf(vehicle.kilometers()) : "");
         grid.add(new Label("Kilométrage:"), 0, row);
         grid.add(kilometersField, 1, row++);
         kilometersField.setUserData("kilometers");
 
         DatePicker acquisitionDatePicker = new DatePicker(
-            vehicle != null && vehicle.getAcquisitionDate() != null ?
-            vehicle.getAcquisitionDate().toLocalDate() : LocalDate.now()
+            vehicle != null && vehicle.acquisitionDate() != null ?
+            vehicle.acquisitionDate().toLocalDate() : LocalDate.now()
         );
         grid.add(new Label("Date d'acquisition:"), 0, row);
         grid.add(acquisitionDatePicker, 1, row++);
@@ -344,7 +344,7 @@ public class VehicleManagementViewBuilder implements Builder<Region> {
 
         ComboBox<Status> statusCombo = new ComboBox<>();
         statusCombo.getItems().addAll(Status.values());
-        statusCombo.setValue(vehicle != null ? vehicle.getStatus() : Status.AVAILABLE);
+        statusCombo.setValue(vehicle != null ? vehicle.status() : Status.AVAILABLE);
         grid.add(new Label("Statut:"), 0, row);
         grid.add(statusCombo, 1, row++);
         statusCombo.setUserData("status");
@@ -444,13 +444,13 @@ public class VehicleManagementViewBuilder implements Builder<Region> {
         alert.setTitle("Confirmer la suppression");
         alert.setHeaderText("Supprimer le véhicule");
         alert.setContentText("Êtes-vous sûr de vouloir supprimer ce véhicule ?\n\n" +
-                           selected.getManufacturer() + " " + selected.getModel() +
-                           " (" + selected.getLicencePlate() + ")\n\n" +
+                           selected.manufacturer() + " " + selected.model() +
+                           " (" + selected.licencePlate() + ")\n\n" +
                            "Cette action est irréversible.");
 
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
-            deleteVehicleAction.accept(selected.getUuid());
+            deleteVehicleAction.accept(selected.uuid());
         }
     }
 }

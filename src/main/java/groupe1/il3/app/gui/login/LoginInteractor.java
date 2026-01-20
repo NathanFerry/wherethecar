@@ -46,7 +46,7 @@ public class LoginInteractor {
                 // Hash the provided password and compare with stored hash
                 String hashedPassword = hashPassword(password);
 
-                if (!hashedPassword.equals(agent.getPasswordHash())) {
+                if (!hashedPassword.equals(agent.passwordHash())) {
                     return null;
                 }
 

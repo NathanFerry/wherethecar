@@ -33,8 +33,8 @@ public class HeaderController {
     private void initializeUserInfo() {
         Agent currentAgent = SessionManager.getInstance().getCurrentAgent();
         if (currentAgent != null) {
-            model.setUserFirstname(currentAgent.getFirstname());
-            model.setUserLastname(currentAgent.getLastname());
+            model.setUserFirstname(currentAgent.firstname());
+            model.setUserLastname(currentAgent.lastname());
         }
     }
 
@@ -46,7 +46,7 @@ public class HeaderController {
 
         model.clearMessages();
         model.clearEditFields();
-        model.setEditEmail(currentAgent.getEmail());
+        model.setEditEmail(currentAgent.email());
 
         HeaderViewBuilder headerViewBuilder = (HeaderViewBuilder) viewBuilder;
         currentDialog = headerViewBuilder.buildEditDialog();

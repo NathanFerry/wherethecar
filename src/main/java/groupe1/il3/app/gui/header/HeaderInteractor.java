@@ -19,16 +19,16 @@ public class HeaderInteractor {
             protected Agent call() {
                 String email = newEmail != null && !newEmail.trim().isEmpty()
                     ? newEmail.trim()
-                    : currentAgent.getEmail();
+                    : currentAgent.email();
 
                 String passwordHash = newPassword != null && !newPassword.trim().isEmpty()
                     ? PasswordHasher.hashPassword(newPassword)
-                    : currentAgent.getPasswordHash();
+                    : currentAgent.passwordHash();
 
                 Agent updatedAgent = new Agent(
-                    currentAgent.getUuid(),
-                    currentAgent.getFirstname(),
-                    currentAgent.getLastname(),
+                    currentAgent.uuid(),
+                    currentAgent.firstname(),
+                    currentAgent.lastname(),
                     email,
                     passwordHash,
                     currentAgent.isAdmin()

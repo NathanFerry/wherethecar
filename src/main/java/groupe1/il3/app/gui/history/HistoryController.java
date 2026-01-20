@@ -33,7 +33,7 @@ public class HistoryController {
         }
 
         model.setLoading(true);
-        Task<List<Reservation>> task = interactor.createLoadHistoryTask(currentAgent.getUuid());
+        Task<List<Reservation>> task = interactor.createLoadHistoryTask(currentAgent.uuid());
 
         task.setOnSucceeded(event -> {
             model.setLoading(false);

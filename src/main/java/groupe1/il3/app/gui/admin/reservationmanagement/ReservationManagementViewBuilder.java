@@ -54,10 +54,10 @@ public class ReservationManagementViewBuilder implements Builder<Region> {
                 if (empty || reservation == null) {
                     setText(null);
                 } else {
-                    String agentName = reservation.getAgent() != null ?
-                        reservation.getAgent().getFirstname() + " " + reservation.getAgent().getLastname() : "Unknown";
-                    String vehicleInfo = reservation.getVehicle() != null ?
-                        reservation.getVehicle().getManufacturer() + " " + reservation.getVehicle().getModel() : "Unknown";
+                    String agentName = reservation.agent() != null ?
+                        reservation.agent().firstname() + " " + reservation.agent().lastname() : "Unknown";
+                    String vehicleInfo = reservation.vehicle() != null ?
+                        reservation.vehicle().manufacturer() + " " + reservation.vehicle().model() : "Unknown";
                     setText(agentName + " - " + vehicleInfo);
                 }
             }
@@ -115,27 +115,27 @@ public class ReservationManagementViewBuilder implements Builder<Region> {
             if (newVal != null) {
                 titleLabel.setText("Détails de la Réservation");
 
-                addDetailRow(detailsGrid, 0, "UUID:", newVal.getUuid().toString());
+                addDetailRow(detailsGrid, 0, "UUID:", newVal.uuid().toString());
 
-                if (newVal.getAgent() != null) {
+                if (newVal.agent() != null) {
                     addDetailRow(detailsGrid, 1, "Agent:",
-                        newVal.getAgent().getFirstname() + " " + newVal.getAgent().getLastname());
-                    addDetailRow(detailsGrid, 2, "Email:", newVal.getAgent().getEmail());
+                        newVal.agent().firstname() + " " + newVal.agent().lastname());
+                    addDetailRow(detailsGrid, 2, "Email:", newVal.agent().email());
                 }
 
-                if (newVal.getVehicle() != null) {
+                if (newVal.vehicle() != null) {
                     addDetailRow(detailsGrid, 3, "Véhicule:",
-                        newVal.getVehicle().getManufacturer() + " " + newVal.getVehicle().getModel());
-                    addDetailRow(detailsGrid, 4, "Plaque:", newVal.getVehicle().getLicencePlate());
+                        newVal.vehicle().manufacturer() + " " + newVal.vehicle().model());
+                    addDetailRow(detailsGrid, 4, "Plaque:", newVal.vehicle().licencePlate());
                 }
 
                 addDetailRow(detailsGrid, 5, "Date de début:",
-                    newVal.getStartDate() != null ?
-                    newVal.getStartDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")) : "N/A");
+                    newVal.startDate() != null ?
+                    newVal.startDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")) : "N/A");
                 addDetailRow(detailsGrid, 6, "Date de fin:",
-                    newVal.getEndDate() != null ?
-                    newVal.getEndDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")) : "N/A");
-                addDetailRow(detailsGrid, 7, "Statut:", formatReservationStatus(newVal.getStatus()));
+                    newVal.endDate() != null ?
+                    newVal.endDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")) : "N/A");
+                addDetailRow(detailsGrid, 7, "Statut:", formatReservationStatus(newVal.status()));
             }
         });
 
@@ -177,20 +177,20 @@ public class ReservationManagementViewBuilder implements Builder<Region> {
         alert.setTitle("Confirmation d'approbation");
         alert.setHeaderText("Approuver la réservation");
 
-        String agentName = selected.getAgent() != null ?
-            selected.getAgent().getFirstname() + " " + selected.getAgent().getLastname() : "Unknown";
-        String vehicleInfo = selected.getVehicle() != null ?
-            selected.getVehicle().getManufacturer() + " " + selected.getVehicle().getModel() : "Unknown";
+        String agentName = selected.agent() != null ?
+            selected.agent().firstname() + " " + selected.agent().lastname() : "Unknown";
+        String vehicleInfo = selected.vehicle() != null ?
+            selected.vehicle().manufacturer() + " " + selected.vehicle().model() : "Unknown";
 
         alert.setContentText("Êtes-vous sûr de vouloir approuver cette réservation ?\n\n" +
                            "Agent: " + agentName + "\n" +
                            "Véhicule: " + vehicleInfo + "\n" +
-                           "Du: " + selected.getStartDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")) + "\n" +
-                           "Au: " + selected.getEndDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")));
+                           "Du: " + selected.startDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")) + "\n" +
+                           "Au: " + selected.endDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")));
 
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
-            approveReservationAction.accept(selected.getUuid(), selected.getVehicle().getUuid());
+            approveReservationAction.accept(selected.uuid(), selected.vehicle().uuid());
         }
     }
 
@@ -203,21 +203,21 @@ public class ReservationManagementViewBuilder implements Builder<Region> {
         alert.setTitle("Confirmer le refus");
         alert.setHeaderText("Refuser la réservation");
         alert.setContentText("Voulez-vous vraiment refuser cette réservation ?");
-        String agentName = selected.getAgent() != null ?
-            selected.getAgent().getFirstname() + " " + selected.getAgent().getLastname() : "Unknown";
-        String vehicleInfo = selected.getVehicle() != null ?
-            selected.getVehicle().getManufacturer() + " " + selected.getVehicle().getModel() : "Unknown";
+        String agentName = selected.agent() != null ?
+            selected.agent().firstname() + " " + selected.agent().lastname() : "Unknown";
+        String vehicleInfo = selected.vehicle() != null ?
+            selected.vehicle().manufacturer() + " " + selected.vehicle().model() : "Unknown";
 
         alert.setContentText("Êtes-vous sûr de vouloir refuser cette réservation ?\n\n" +
                            "Agent: " + agentName + "\n" +
                            "Véhicule: " + vehicleInfo + "\n" +
-                           "Du: " + selected.getStartDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")) + "\n" +
-                           "Au: " + selected.getEndDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")) + "\n\n" +
+                           "Du: " + selected.startDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")) + "\n" +
+                           "Au: " + selected.endDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")) + "\n\n" +
                            "Cette action est irréversible.");
 
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
-            cancelReservationAction.accept(selected.getUuid());
+            cancelReservationAction.accept(selected.uuid());
         }
     }
 }

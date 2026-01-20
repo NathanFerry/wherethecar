@@ -107,43 +107,43 @@ public class ReservationsViewBuilder implements Builder<Region> {
             if (newVal != null) {
                 titleLabel.setText("Détails de la réservation");
 
-                if (newVal.getStatus() == ReservationStatus.PENDING) {
+                if (newVal.status() == ReservationStatus.PENDING) {
                     pendingNoticeBox.setVisible(true);
                 }
 
                 int row = 0;
 
                 addSectionHeader(detailsGrid, row++, "Période de réservation");
-                addDetailRow(detailsGrid, row++, "Statut:", formatReservationStatus(newVal.getStatus()));
+                addDetailRow(detailsGrid, row++, "Statut:", formatReservationStatus(newVal.status()));
                 addDetailRow(detailsGrid, row++, "Date de début:",
-                    formatDateTime(newVal.getStartDate()));
+                    formatDateTime(newVal.startDate()));
                 addDetailRow(detailsGrid, row++, "Date de fin:",
-                    formatDateTime(newVal.getEndDate()));
+                    formatDateTime(newVal.endDate()));
 
                 row++;
                 addSectionHeader(detailsGrid, row++, "Véhicule");
-                if (newVal.getVehicle() != null) {
+                if (newVal.vehicle() != null) {
                     addDetailRow(detailsGrid, row++, "Modèle:",
-                        newVal.getVehicle().getManufacturer() + " " + newVal.getVehicle().getModel());
+                        newVal.vehicle().manufacturer() + " " + newVal.vehicle().model());
                     addDetailRow(detailsGrid, row++, "Plaque:",
-                        newVal.getVehicle().getLicencePlate());
+                        newVal.vehicle().licencePlate());
                     addDetailRow(detailsGrid, row++, "Énergie:",
-                        formatEnergy(newVal.getVehicle().getEnergy().toString()));
+                        formatEnergy(newVal.vehicle().energy().toString()));
                     addDetailRow(detailsGrid, row++, "Sièges:",
-                        String.valueOf(newVal.getVehicle().getSeats()));
+                        String.valueOf(newVal.vehicle().seats()));
                     addDetailRow(detailsGrid, row++, "Couleur:",
-                        newVal.getVehicle().getColor());
+                        newVal.vehicle().color());
                 } else {
                     addDetailRow(detailsGrid, row++, "Véhicule:", "Non disponible");
                 }
 
                 row++;
                 addSectionHeader(detailsGrid, row++, "Agent");
-                if (newVal.getAgent() != null) {
+                if (newVal.agent() != null) {
                     addDetailRow(detailsGrid, row++, "Nom:",
-                        newVal.getAgent().getFirstname() + " " + newVal.getAgent().getLastname());
+                        newVal.agent().firstname() + " " + newVal.agent().lastname());
                     addDetailRow(detailsGrid, row++, "Email:",
-                        newVal.getAgent().getEmail());
+                        newVal.agent().email());
                 } else {
                     addDetailRow(detailsGrid, row++, "Agent:", "Non disponible");
                 }
@@ -239,8 +239,8 @@ public class ReservationsViewBuilder implements Builder<Region> {
         errorLabel.visibleProperty().bind(model.returnErrorMessageProperty().isNotEmpty());
 
         model.selectedReservationProperty().addListener((obs, oldVal, newVal) -> {
-            if (newVal != null && newVal.getVehicle() != null && newVal.getStatus() == ReservationStatus.CONFIRMED) {
-                int currentKm = newVal.getVehicle().getKilometers();
+            if (newVal != null && newVal.vehicle() != null && newVal.status() == ReservationStatus.CONFIRMED) {
+                int currentKm = newVal.vehicle().kilometers();
                 currentKilometersLabel.setText("Kilométrage actuel: " + currentKm + " km");
                 newKilometersField.setText(String.valueOf(currentKm));
                 returnBox.setVisible(true);
@@ -324,7 +324,7 @@ public class ReservationsViewBuilder implements Builder<Region> {
 
         private static Label getStatusLabel(Reservation reservation) {
             Label statusLabel = new Label();
-            ReservationStatus status = reservation.getStatus();
+            ReservationStatus status = reservation.status();
 
             if (status != null) {
                 String statusText = switch (status) {
@@ -354,9 +354,9 @@ public class ReservationsViewBuilder implements Builder<Region> {
         private static Label getVehicleTypeLabel(Reservation reservation) {
             Label vehicleLabel = new Label();
 
-            if (reservation.getVehicle() != null) {
-                vehicleLabel.setText(reservation.getVehicle().getManufacturer() + " " +
-                        reservation.getVehicle().getModel());
+            if (reservation.vehicle() != null) {
+                vehicleLabel.setText(reservation.vehicle().manufacturer() + " " +
+                        reservation.vehicle().model());
                 vehicleLabel.getStyleClass().add("label-bold");
             } else {
                 vehicleLabel.setText("Véhicule inconnu");
@@ -369,9 +369,9 @@ public class ReservationsViewBuilder implements Builder<Region> {
         private static Label getReservationStartDateLabel(Reservation reservation) {
             Label dateLabel = new Label();
 
-            if (reservation.getStartDate() != null) {
+            if (reservation.startDate() != null) {
                 dateLabel.setText("Du " +
-                        reservation.getStartDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")));
+                        reservation.startDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")));
             } else {
                 dateLabel.setText("Date non spécifiée");
             }
@@ -381,9 +381,9 @@ public class ReservationsViewBuilder implements Builder<Region> {
 
         private static Label getReservationEndDateLabel(Reservation reservation) {
             Label endDateLabel = new Label();
-            if (reservation.getEndDate() != null) {
+            if (reservation.endDate() != null) {
                 endDateLabel.setText("Au " +
-                        reservation.getEndDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")));
+                        reservation.endDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")));
             } else {
                 endDateLabel.setText("");
             }

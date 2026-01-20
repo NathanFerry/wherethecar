@@ -61,18 +61,18 @@ public class ReservationBroker {
         Vehicle vehicle = vehicleBroker.getVehicleById(vehicleUuid);
         if (vehicle != null) {
             Vehicle updatedVehicle = new Vehicle(
-                vehicle.getUuid(),
-                vehicle.getLicencePlate(),
-                vehicle.getManufacturer(),
-                vehicle.getModel(),
-                vehicle.getEnergy(),
-                vehicle.getPower(),
-                vehicle.getSeats(),
-                vehicle.getCapacity(),
-                vehicle.getUtilityWeight(),
-                vehicle.getColor(),
+                vehicle.uuid(),
+                vehicle.licencePlate(),
+                vehicle.manufacturer(),
+                vehicle.model(),
+                vehicle.energy(),
+                vehicle.power(),
+                vehicle.seats(),
+                vehicle.capacity(),
+                vehicle.utilityWeight(),
+                vehicle.color(),
                 newKilometers,
-                vehicle.getAcquisitionDate(),
+                vehicle.acquisitionDate(),
                 Status.AVAILABLE
             );
             vehicleBroker.updateVehicle(updatedVehicle);
