@@ -208,17 +208,18 @@ public class SimpleReservationDao implements ReservationDao {
         List<ReservationDto> reservations = new ArrayList<>();
 
         try {
+
             Connection conn = connectionManager.getNewConnection();
             PreparedStatement stmt = conn.prepareStatement(query);
 
             stmt.setObject(1, vehicleUuid);
 
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    reservations.add(mapResultSetToReservationDto(rs));
-                }
-                return reservations;
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                reservations.add(mapResultSetToReservationDto(rs));
             }
+
+            return reservations;
 
         } catch (SQLException e) {
             throw new RuntimeException("Failed to retrieve reservations for vehicle: " + vehicleUuid, e);
@@ -229,31 +230,28 @@ public class SimpleReservationDao implements ReservationDao {
 
     @Override
     public boolean hasOverlappingReservation(UUID vehicleUuid, LocalDateTime startDate, LocalDateTime endDate) {
+
         String query = "SELECT COUNT(*) FROM reservation " +
                        "WHERE vehicle_uuid = ? " +
                        "AND status IN ('pending', 'confirmed') " +
-                       "AND ((start_date <= ? AND end_date > ?) OR " +
-                       "(start_date < ? AND end_date >= ?) OR " +
-                       "(start_date >= ? AND end_date <= ?))";
+                       "AND start_date < ? " +
+                       "AND end_date > ?";
 
         try {
+
             Connection conn = connectionManager.getNewConnection();
             PreparedStatement stmt = conn.prepareStatement(query);
 
             stmt.setObject(1, vehicleUuid);
             stmt.setTimestamp(2, Timestamp.valueOf(endDate));
             stmt.setTimestamp(3, Timestamp.valueOf(startDate));
-            stmt.setTimestamp(4, Timestamp.valueOf(endDate));
-            stmt.setTimestamp(5, Timestamp.valueOf(startDate));
-            stmt.setTimestamp(6, Timestamp.valueOf(startDate));
-            stmt.setTimestamp(7, Timestamp.valueOf(endDate));
 
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt(1) > 0;
-                }
-                return false;
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
             }
+
+            return false;
 
         } catch (SQLException e) {
             throw new RuntimeException("Failed to check for overlapping reservations", e);

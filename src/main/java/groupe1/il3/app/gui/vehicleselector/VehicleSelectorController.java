@@ -63,6 +63,7 @@ public class VehicleSelectorController {
 
     private void reserveVehicle() {
         model.setReservationErrorMessage("");
+        model.setReservationSuccessful(false);
 
         if (model.getSelectedVehicle() == null) {
             model.setReservationErrorMessage("Veuillez sélectionner un véhicule");
@@ -89,15 +90,18 @@ public class VehicleSelectorController {
         task.setOnSucceeded(event -> {
             if (task.getValue()) {
                 model.setReservationErrorMessage("");
-                loadVehicles(); // Reload vehicles to update status
+                model.setReservationSuccessful(true);
+                loadVehicles();
                 loadVehicleReservations(); // Reload reservations to show the new one
             } else {
                 model.setReservationErrorMessage("Ce véhicule est déjà réservé pour cette période");
+                model.setReservationSuccessful(false);
             }
         });
 
         task.setOnFailed(event -> {
             model.setReservationErrorMessage("Erreur lors de la création de la réservation");
+            model.setReservationSuccessful(false);
             System.err.println("Failed to create reservation: " + task.getException().getMessage());
             task.getException().printStackTrace();
         });

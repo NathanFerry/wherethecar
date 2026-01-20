@@ -41,7 +41,6 @@ public class VehicleSelectorInteractor {
         return new Task<>() {
             @Override
             protected Boolean call() {
-                // Check if there's an overlapping reservation
                 if (reservationBroker.hasOverlappingReservation(vehicleUuid, startDate, endDate)) {
                     return false;
                 }
