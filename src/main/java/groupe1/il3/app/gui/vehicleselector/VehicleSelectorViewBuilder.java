@@ -306,7 +306,7 @@ public class VehicleSelectorViewBuilder implements Builder<Region> {
             return switch (status) {
                 case "AVAILABLE" -> "✓ Disponible";
                 case "RESERVED" -> "⏳ Réservé";
-                case "MAINTENANCE" -> "🔧 Maintenance";
+                case "MAINTENANCE" -> "⚠️ Maintenance";
                 default -> "Inconnu";
             };
         }
