@@ -63,12 +63,12 @@ public class AgentBroker {
 
     private Agent convertToAgent(AgentDto dto) {
         return new Agent(
-                dto.getUuid(),
-                dto.getFirstName(),
-                dto.getLastName(),
-                dto.getEmail(),
-                dto.getPasswordHash(),
-                dto.getIsAdmin()
+                dto.uuid(),
+                dto.firstName(),
+                dto.lastName(),
+                dto.email(),
+                dto.passwordHash(),
+                dto.isAdmin()
         );
     }
 }

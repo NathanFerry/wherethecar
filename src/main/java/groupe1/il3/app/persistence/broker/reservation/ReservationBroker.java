@@ -81,7 +81,7 @@ public class ReservationBroker {
 
     public List<Reservation> getPendingReservations() {
         return reservationDao.getAllReservations().stream()
-                .filter(dto -> "pending".equals(dto.getStatus()))
+                .filter(dto -> "pending".equals(dto.status()))
                 .map(this::convertToReservation)
                 .collect(Collectors.toList());
     }
@@ -96,16 +96,16 @@ public class ReservationBroker {
     }
 
     private Reservation convertToReservation(ReservationDto dto) {
-        Agent agent = agentBroker.getAgentById(dto.getAgentUuid());
-        Vehicle vehicle = vehicleBroker.getVehicleById(dto.getVehicleUuid());
+        Agent agent = agentBroker.getAgentById(dto.agentUuid());
+        Vehicle vehicle = vehicleBroker.getVehicleById(dto.vehicleUuid());
 
         return new Reservation(
-                dto.getUuid(),
+                dto.uuid(),
                 agent,
                 vehicle,
-                dto.getStart(),
-                dto.getEnd(),
-                mapStringToReservationStatus(dto.getStatus())
+                dto.start(),
+                dto.end(),
+                mapStringToReservationStatus(dto.status())
         );
     }
 

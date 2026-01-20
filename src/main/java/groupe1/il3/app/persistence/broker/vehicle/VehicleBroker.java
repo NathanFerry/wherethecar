@@ -77,19 +77,19 @@ public class VehicleBroker {
 
     private Vehicle convertToVehicle(VehicleDto dto) {
         return new Vehicle(
-                dto.getUuid(),
-                dto.getLicensePlate(),
-                dto.getManufacturer(),
-                dto.getModel(),
-                parseEnergy(dto.getEnergy()),
-                dto.getPower(),
-                dto.getSeats(),
-                dto.getCapacity(),
-                dto.getUtilityWeight(),
-                dto.getColor(),
-                dto.getKilometers(),
-                dto.getAcquisitionDate(),
-                parseStatus(dto.getStatus())
+                dto.uuid(),
+                dto.licensePlate(),
+                dto.manufacturer(),
+                dto.model(),
+                parseEnergy(dto.energy()),
+                dto.power(),
+                dto.seats(),
+                dto.capacity(),
+                dto.utilityWeight(),
+                dto.color(),
+                dto.kilometers(),
+                dto.acquisitionDate(),
+                parseStatus(dto.status())
         );
     }
 
