@@ -11,6 +11,12 @@ public class DatabaseConnectionManager {
     private final Object configLock = new Object();
 
     private DatabaseConnectionManager() {
+        // Required for the JPackage installer to work properly
+        try {
+            Class.forName("org.postgresql.Driver");
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException("PostgreSQL JDBC Driver not found", e);
+        }
     }
 
     public static DatabaseConnectionManager getInstance() {

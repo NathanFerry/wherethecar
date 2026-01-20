@@ -7,7 +7,7 @@ plugins {
 }
 
 group = 'groupe1.il3'
-version = '0.1.3'
+version = '0.2.0'
 
 repositories {
     mavenCentral()
@@ -47,9 +47,11 @@ jlink {
     mergedModule {
         requires 'java.sql'
         requires 'java.naming'
+        requires 'java.management'
     }
 
     addExtraDependencies("java.sql")
+    addExtraDependencies("postgresql")
     forceMerge 'postgresql'
 
     javaHome = javaToolchains.compilerFor(java.toolchain).get().metadata.installationPath.asFile.absolutePath
