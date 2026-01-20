@@ -159,6 +159,7 @@ public class AgentManagementViewBuilder implements Builder<Region> {
 
     private void showAddAgentDialog() {
         Dialog<Agent> dialog = new Dialog<>();
+        StyleApplier.applyStylesheets(dialog);
         dialog.setTitle("Ajouter un utilisateur");
         dialog.setHeaderText("Saisir les informations de l'utilisateur");
 

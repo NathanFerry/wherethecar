@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+//TODO: Change VehicleUuid to Vehicle object
 public record MaintenanceOperation(
         UUID uuid,
         UUID vehicleUuid,

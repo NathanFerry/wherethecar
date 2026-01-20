@@ -174,6 +174,7 @@ public class ReservationManagementViewBuilder implements Builder<Region> {
         if (selected == null) return;
 
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        StyleApplier.applyStylesheets(alert);
         alert.setTitle("Confirmation d'approbation");
         alert.setHeaderText("Approuver la réservation");
 
