@@ -75,8 +75,13 @@ public class VehicleSelectorViewBuilder implements Builder<Region> {
         Label title = new Label("Liste des Véhicules");
         title.getStyleClass().add("vehicle-list-title");
 
+        TextField searchField = new TextField();
+        searchField.setPromptText("Rechercher un véhicule...");
+        searchField.textProperty().bindBidirectional(model.searchTextProperty());
+        searchField.getStyleClass().add("vehicle-search-field");
+
         ListView<Vehicle> vehicleListView = new ListView<>();
-        vehicleListView.setItems(model.vehiclesProperty());
+        vehicleListView.setItems(model.getFilteredVehicles());
         vehicleListView.setCellFactory(lv -> new VehicleListCell());
 
         vehicleListView.getSelectionModel().selectedItemProperty().addListener(
@@ -95,7 +100,7 @@ public class VehicleSelectorViewBuilder implements Builder<Region> {
         refreshButton.setMaxWidth(Double.MAX_VALUE);
         refreshButton.getStyleClass().add("vehicle-refresh-button");
 
-        listPane.getChildren().addAll(title, vehicleListView, refreshButton);
+        listPane.getChildren().addAll(title, searchField, vehicleListView, refreshButton);
 
         return listPane;
     }

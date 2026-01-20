@@ -10,6 +10,22 @@
     -fx-text-fill: -fx-text-primary;
 }
 
+.vehicle-search-field {
+    -fx-background-color: -fx-bg-white;
+    -fx-border-color: -fx-border-default;
+    -fx-border-width: 1px;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-padding: 8px 12px;
+    -fx-font-size: 13px;
+    -fx-prompt-text-fill: -fx-text-secondary;
+}
+
+.vehicle-search-field:focused {
+    -fx-border-color: -fx-color-primary;
+    -fx-border-width: 2px;
+}
+
 .vehicle-list-cell {
     -fx-background-color: -fx-bg-white;
     -fx-border-color: -fx-border-default;
