@@ -47,9 +47,11 @@ jlink {
     mergedModule {
         requires 'java.sql'
         requires 'java.naming'
+        requires 'java.management'
     }
 
     addExtraDependencies("java.sql")
+    addExtraDependencies("postgresql")
     forceMerge 'postgresql'
 
     javaHome = javaToolchains.compilerFor(java.toolchain).get().metadata.installationPath.asFile.absolutePath
