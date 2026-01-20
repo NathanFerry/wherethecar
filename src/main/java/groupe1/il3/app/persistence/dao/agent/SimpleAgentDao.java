@@ -108,12 +108,12 @@ public class SimpleAgentDao implements AgentDao {
             Connection conn = connectionManager.getNewConnection();
             PreparedStatement stmt = conn.prepareStatement(query);
 
-            stmt.setObject(1, agentDto.getUuid());
-            stmt.setString(2, agentDto.getFirstName());
-            stmt.setString(3, agentDto.getLastName());
-            stmt.setString(4, agentDto.getEmail());
-            stmt.setString(5, agentDto.getPasswordHash());
-            stmt.setBoolean(6, agentDto.getIsAdmin());
+            stmt.setObject(1, agentDto.uuid());
+            stmt.setString(2, agentDto.firstName());
+            stmt.setString(3, agentDto.lastName());
+            stmt.setString(4, agentDto.email());
+            stmt.setString(5, agentDto.passwordHash());
+            stmt.setBoolean(6, agentDto.isAdmin());
 
             stmt.executeUpdate();
 
@@ -134,17 +134,17 @@ public class SimpleAgentDao implements AgentDao {
             Connection conn = connectionManager.getNewConnection();
             PreparedStatement stmt = conn.prepareStatement(query);
 
-            stmt.setString(1, agentDto.getFirstName());
-            stmt.setString(2, agentDto.getLastName());
-            stmt.setString(3, agentDto.getEmail());
-            stmt.setString(4, agentDto.getPasswordHash());
-            stmt.setBoolean(5, agentDto.getIsAdmin());
-            stmt.setObject(6, agentDto.getUuid());
+            stmt.setString(1, agentDto.firstName());
+            stmt.setString(2, agentDto.lastName());
+            stmt.setString(3, agentDto.email());
+            stmt.setString(4, agentDto.passwordHash());
+            stmt.setBoolean(5, agentDto.isAdmin());
+            stmt.setObject(6, agentDto.uuid());
 
             stmt.executeUpdate();
 
         } catch (SQLException e) {
-            throw new RuntimeException("Failed to update agent with UUID: " + agentDto.getUuid(), e);
+            throw new RuntimeException("Failed to update agent with UUID: " + agentDto.uuid(), e);
         } catch (DatabaseException e) {
             throw new RuntimeException("Database connection error while updating agent", e);
         }

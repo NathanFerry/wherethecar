@@ -1,7 +1,9 @@
 package groupe1.il3.app;
 
+import groupe1.il3.app.domain.authentication.SessionManager;
 import groupe1.il3.app.gui.login.LoginController;
 import groupe1.il3.app.gui.mainframe.MainFrameController;
+import groupe1.il3.app.gui.style.StyleApplier;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -14,32 +16,31 @@ public class App extends Application {
     public void start(Stage primaryStage) {
         this.primaryStage = primaryStage;
 
-        // Show login screen
         showLoginScreen();
 
         primaryStage.setTitle("WhereTheCar");
         primaryStage.show();
     }
 
-    /**
-     * Displays the login screen.
-     */
     private void showLoginScreen() {
         LoginController loginController = new LoginController(agent -> {
-            // On successful login, show the main frame
             showMainFrame();
         });
 
         Scene loginScene = new Scene(loginController.getView());
+        StyleApplier.applyStylesheets(loginScene);
         primaryStage.setScene(loginScene);
     }
 
-    /**
-     * Displays the main application frame.
-     */
     private void showMainFrame() {
-        MainFrameController mainFrameController = new MainFrameController();
+        MainFrameController mainFrameController = new MainFrameController(this::handleLogout);
         Scene mainScene = new Scene(mainFrameController.getView());
+        StyleApplier.applyStylesheets(mainScene);
         primaryStage.setScene(mainScene);
+    }
+
+    private void handleLogout() {
+        SessionManager.getInstance().logout();
+        showLoginScreen();
     }
 }

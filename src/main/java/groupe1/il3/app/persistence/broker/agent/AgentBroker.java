@@ -34,11 +34,11 @@ public class AgentBroker {
 
     public void createAgent(Agent agent) {
         AgentDto dto = new AgentDto(
-            agent.getUuid(),
-            agent.getFirstname(),
-            agent.getLastname(),
-            agent.getEmail(),
-            agent.getPasswordHash(),
+            agent.uuid(),
+            agent.firstname(),
+            agent.lastname(),
+            agent.email(),
+            agent.passwordHash(),
             agent.isAdmin()
         );
         agentDao.createAgent(dto);
@@ -46,13 +46,14 @@ public class AgentBroker {
 
     public void updateAgent(Agent agent) {
         AgentDto dto = new AgentDto(
-            agent.getUuid(),
-            agent.getFirstname(),
-            agent.getLastname(),
-            agent.getEmail(),
-            agent.getPasswordHash(),
+            agent.uuid(),
+            agent.firstname(),
+            agent.lastname(),
+            agent.email(),
+            agent.passwordHash(),
             agent.isAdmin()
         );
+
         agentDao.updateAgent(dto);
     }
 
@@ -62,12 +63,12 @@ public class AgentBroker {
 
     private Agent convertToAgent(AgentDto dto) {
         return new Agent(
-                dto.getUuid(),
-                dto.getFirstName(),
-                dto.getLastName(),
-                dto.getEmail(),
-                dto.getPasswordHash(),
-                dto.getIsAdmin()
+                dto.uuid(),
+                dto.firstName(),
+                dto.lastName(),
+                dto.email(),
+                dto.passwordHash(),
+                dto.isAdmin()
         );
     }
 }

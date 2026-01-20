@@ -1,6 +1,7 @@
 package groupe1.il3.app.gui.mainframe;
 
 import groupe1.il3.app.domain.authentication.SessionManager;
+import groupe1.il3.app.gui.header.HeaderController;
 import javafx.scene.control.Button;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Region;
@@ -12,13 +13,17 @@ public class MainFrameViewBuilder implements Builder<Region> {
     private final MainFrameModel model;
     private final Runnable showVehicleListAction;
     private final Runnable showReservationsAction;
+    private final Runnable showHistoryAction;
     private final Runnable showAdminPanelAction;
+    private final Runnable onLogout;
 
-    public MainFrameViewBuilder(MainFrameModel model, Runnable showVehicleListAction, Runnable showReservationsAction, Runnable showAdminPanelAction) {
+    public MainFrameViewBuilder(MainFrameModel model, Runnable showVehicleListAction, Runnable showReservationsAction, Runnable showHistoryAction, Runnable showAdminPanelAction, Runnable onLogout) {
         this.model = model;
         this.showVehicleListAction = showVehicleListAction;
         this.showReservationsAction = showReservationsAction;
+        this.showHistoryAction = showHistoryAction;
         this.showAdminPanelAction = showAdminPanelAction;
+        this.onLogout = onLogout;
     }
 
     @Override
@@ -26,14 +31,15 @@ public class MainFrameViewBuilder implements Builder<Region> {
         BorderPane panel = new BorderPane();
         panel.setPrefSize(1200, 800);
 
+        HeaderController headerController = new HeaderController(onLogout);
+        panel.setTop(headerController.getView());
+
         panel.setLeft(this.navigationPanel());
 
-        // Bind center content to model property
         model.centerContentProperty().addListener((obs, oldVal, newVal) -> {
             panel.setCenter(newVal);
         });
 
-        // Show vehicle list by default
         showVehicleListAction.run();
 
         return panel;
@@ -42,12 +48,16 @@ public class MainFrameViewBuilder implements Builder<Region> {
     private Region navigationPanel() {
         VBox navPanel = new VBox(10);
         navPanel.setPrefWidth(200);
+        navPanel.getStyleClass().add("navigation-panel");
 
         Button vehiclesBtn = this.navigationButton("Liste des véhicules");
         vehiclesBtn.setOnAction(e -> showVehicleListAction.run());
 
         Button reservationsBtn = this.navigationButton("Mes réservations");
         reservationsBtn.setOnAction(e -> showReservationsAction.run());
+
+        Button historyBtn = this.navigationButton("Historique");
+        historyBtn.setOnAction(e -> showHistoryAction.run());
 
         Button adminBtn = this.navigationButton("Administration");
         adminBtn.setOnAction(e -> showAdminPanelAction.run());
@@ -57,7 +67,7 @@ public class MainFrameViewBuilder implements Builder<Region> {
         adminBtn.setVisible(isAdmin);
         adminBtn.setManaged(isAdmin);
 
-        navPanel.getChildren().addAll(vehiclesBtn, reservationsBtn, adminBtn);
+        navPanel.getChildren().addAll(vehiclesBtn, reservationsBtn, historyBtn, adminBtn);
 
         return navPanel;
     }
@@ -65,6 +75,7 @@ public class MainFrameViewBuilder implements Builder<Region> {
     private Button navigationButton(String title) {
         Button btn = new Button(title);
         btn.setMaxWidth(Double.MAX_VALUE);
+        btn.getStyleClass().add("nav-button");
         return btn;
     }
 }

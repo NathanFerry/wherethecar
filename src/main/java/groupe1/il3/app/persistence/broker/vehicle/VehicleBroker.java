@@ -35,38 +35,38 @@ public class VehicleBroker {
 
     public void createVehicle(Vehicle vehicle) {
         VehicleDto dto = new VehicleDto(
-            vehicle.getUuid(),
-            vehicle.getLicencePlate(),
-            vehicle.getManufacturer(),
-            vehicle.getModel(),
-            vehicle.getEnergy().toString().toLowerCase(),
-            vehicle.getPower(),
-            vehicle.getSeats(),
-            vehicle.getCapacity(),
-            vehicle.getUtilityWeight(),
-            vehicle.getColor(),
-            vehicle.getKilometers(),
-            vehicle.getAcquisitionDate(),
-            vehicle.getStatus().toString().toLowerCase()
+            vehicle.uuid(),
+            vehicle.licencePlate(),
+            vehicle.manufacturer(),
+            vehicle.model(),
+            vehicle.energy().toString().toLowerCase(),
+            vehicle.power(),
+            vehicle.seats(),
+            vehicle.capacity(),
+            vehicle.utilityWeight(),
+            vehicle.color(),
+            vehicle.kilometers(),
+            vehicle.acquisitionDate(),
+            vehicle.status().toString().toLowerCase()
         );
         vehicleDao.createVehicle(dto);
     }
 
     public void updateVehicle(Vehicle vehicle) {
         VehicleDto dto = new VehicleDto(
-            vehicle.getUuid(),
-            vehicle.getLicencePlate(),
-            vehicle.getManufacturer(),
-            vehicle.getModel(),
-            vehicle.getEnergy().toString().toLowerCase(),
-            vehicle.getPower(),
-            vehicle.getSeats(),
-            vehicle.getCapacity(),
-            vehicle.getUtilityWeight(),
-            vehicle.getColor(),
-            vehicle.getKilometers(),
-            vehicle.getAcquisitionDate(),
-            vehicle.getStatus().toString().toLowerCase()
+            vehicle.uuid(),
+            vehicle.licencePlate(),
+            vehicle.manufacturer(),
+            vehicle.model(),
+            vehicle.energy().toString().toLowerCase(),
+            vehicle.power(),
+            vehicle.seats(),
+            vehicle.capacity(),
+            vehicle.utilityWeight(),
+            vehicle.color(),
+            vehicle.kilometers(),
+            vehicle.acquisitionDate(),
+            vehicle.status().toString().toLowerCase()
         );
         vehicleDao.updateVehicle(dto);
     }
@@ -77,19 +77,19 @@ public class VehicleBroker {
 
     private Vehicle convertToVehicle(VehicleDto dto) {
         return new Vehicle(
-                dto.getUuid(),
-                dto.getLicensePlate(),
-                dto.getManufacturer(),
-                dto.getModel(),
-                parseEnergy(dto.getEnergy()),
-                dto.getPower(),
-                dto.getSeats(),
-                dto.getCapacity(),
-                dto.getUtilityWeight(),
-                dto.getColor(),
-                dto.getKilometers(),
-                dto.getAcquisitionDate(),
-                parseStatus(dto.getStatus())
+                dto.uuid(),
+                dto.licensePlate(),
+                dto.manufacturer(),
+                dto.model(),
+                parseEnergy(dto.energy()),
+                dto.power(),
+                dto.seats(),
+                dto.capacity(),
+                dto.utilityWeight(),
+                dto.color(),
+                dto.kilometers(),
+                dto.acquisitionDate(),
+                parseStatus(dto.status())
         );
     }
 

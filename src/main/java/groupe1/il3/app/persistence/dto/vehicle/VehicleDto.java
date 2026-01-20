@@ -1,24 +1,13 @@
 package groupe1.il3.app.persistence.dto.vehicle;
 
+import groupe1.il3.app.domain.vehicle.Energy;
+import groupe1.il3.app.domain.vehicle.Status;
+import groupe1.il3.app.domain.vehicle.Vehicle;
+
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-public class VehicleDto {
-    private final UUID uuid;
-    private final String licensePlate;
-    private final String manufacturer;
-    private final String model;
-    private final String energy;
-    private final Integer power;
-    private final Integer seats;
-    private final Integer capacity;
-    private final Integer utilityWeight;
-    private final String color;
-    private final Integer kilometers;
-    private final LocalDateTime acquisitionDate;
-    private final String status;
-
-    public VehicleDto(
+public record VehicleDto(
         UUID uuid,
         String licensePlate,
         String manufacturer,
@@ -32,71 +21,40 @@ public class VehicleDto {
         Integer kilometers,
         LocalDateTime acquisitionDate,
         String status
-    ) {
-        this.uuid = uuid;
-        this.licensePlate = licensePlate;
-        this.manufacturer = manufacturer;
-        this.model = model;
-        this.energy = energy;
-        this.power = power;
-        this.seats = seats;
-        this.capacity = capacity;
-        this.utilityWeight = utilityWeight;
-        this.color = color;
-        this.kilometers = kilometers;
-        this.acquisitionDate = acquisitionDate;
-        this.status = status;
+) {
+    public static VehicleDto fromDomainObject(Vehicle vehicle) {
+        return new VehicleDto(
+                vehicle.uuid(),
+                vehicle.licencePlate(),
+                vehicle.manufacturer(),
+                vehicle.model(),
+                vehicle.energy().toString().toLowerCase(),
+                vehicle.power(),
+                vehicle.seats(),
+                vehicle.capacity(),
+                vehicle.utilityWeight(),
+                vehicle.color(),
+                vehicle.kilometers(),
+                vehicle.acquisitionDate(),
+                vehicle.status().toString().toLowerCase()
+        );
     }
 
-    public UUID getUuid() {
-        return uuid;
-    }
-
-    public String getLicensePlate() {
-        return licensePlate;
-    }
-
-    public String getManufacturer() {
-        return manufacturer;
-    }
-
-    public String getModel() {
-        return model;
-    }
-
-    public String getEnergy() {
-        return energy;
-    }
-
-    public Integer getPower() {
-        return power;
-    }
-
-    public Integer getSeats() {
-        return seats;
-    }
-
-    public Integer getCapacity() {
-        return capacity;
-    }
-
-    public Integer getUtilityWeight() {
-        return utilityWeight;
-    }
-
-    public String getColor() {
-        return color;
-    }
-
-    public Integer getKilometers() {
-        return kilometers;
-    }
-
-    public LocalDateTime getAcquisitionDate() {
-        return acquisitionDate;
-    }
-
-    public String getStatus() {
-        return status;
+    public Vehicle toDomainObject() {
+        return new Vehicle(
+                this.uuid,
+                this.licensePlate,
+                this.manufacturer,
+                this.model,
+                Energy.valueOf(this.energy.toUpperCase()),
+                this.power,
+                this.seats,
+                this.capacity,
+                this.utilityWeight,
+                this.color,
+                this.kilometers,
+                this.acquisitionDate,
+                Status.valueOf(this.status.toUpperCase())
+        );
     }
 }

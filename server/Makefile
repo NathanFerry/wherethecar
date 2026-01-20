@@ -15,7 +15,6 @@ help:
 	@echo "  make restart    - Restart containers"
 	@echo "  make db-create  - Create the database"
 	@echo "  make db-drop    - Drop the database"
-	@echo "  make db-populate- Populate the database with initial data"
 	@echo "  make db-wype    - Wipe the database"
 
 up:

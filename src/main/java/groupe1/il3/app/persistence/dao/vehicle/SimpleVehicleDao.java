@@ -107,20 +107,20 @@ public class SimpleVehicleDao implements VehicleDao {
             Connection conn = connectionManager.getNewConnection();
             PreparedStatement stmt = conn.prepareStatement(query);
 
-            stmt.setObject(1, vehicleDto.getUuid());
-            stmt.setString(2, vehicleDto.getLicensePlate());
-            stmt.setString(3, vehicleDto.getManufacturer());
-            stmt.setString(4, vehicleDto.getModel());
-            stmt.setString(5, vehicleDto.getEnergy());
-            stmt.setInt(6, vehicleDto.getPower());
-            stmt.setInt(7, vehicleDto.getSeats());
-            stmt.setInt(8, vehicleDto.getCapacity());
-            stmt.setInt(9, vehicleDto.getUtilityWeight());
-            stmt.setString(10, vehicleDto.getColor());
-            stmt.setInt(11, vehicleDto.getKilometers());
-            stmt.setTimestamp(12, vehicleDto.getAcquisitionDate() != null ?
-                Timestamp.valueOf(vehicleDto.getAcquisitionDate()) : null);
-            stmt.setString(13, vehicleDto.getStatus());
+            stmt.setObject(1, vehicleDto.uuid());
+            stmt.setString(2, vehicleDto.licensePlate());
+            stmt.setString(3, vehicleDto.manufacturer());
+            stmt.setString(4, vehicleDto.model());
+            stmt.setString(5, vehicleDto.energy());
+            stmt.setInt(6, vehicleDto.power());
+            stmt.setInt(7, vehicleDto.seats());
+            stmt.setInt(8, vehicleDto.capacity());
+            stmt.setInt(9, vehicleDto.utilityWeight());
+            stmt.setString(10, vehicleDto.color());
+            stmt.setInt(11, vehicleDto.kilometers());
+            stmt.setTimestamp(12, vehicleDto.acquisitionDate() != null ?
+                Timestamp.valueOf(vehicleDto.acquisitionDate()) : null);
+            stmt.setString(13, vehicleDto.status());
 
             stmt.executeUpdate();
 
@@ -143,25 +143,25 @@ public class SimpleVehicleDao implements VehicleDao {
             Connection conn = connectionManager.getNewConnection();
             PreparedStatement stmt = conn.prepareStatement(query);
 
-            stmt.setString(1, vehicleDto.getLicensePlate());
-            stmt.setString(2, vehicleDto.getManufacturer());
-            stmt.setString(3, vehicleDto.getModel());
-            stmt.setString(4, vehicleDto.getEnergy());
-            stmt.setInt(5, vehicleDto.getPower());
-            stmt.setInt(6, vehicleDto.getSeats());
-            stmt.setInt(7, vehicleDto.getCapacity());
-            stmt.setInt(8, vehicleDto.getUtilityWeight());
-            stmt.setString(9, vehicleDto.getColor());
-            stmt.setInt(10, vehicleDto.getKilometers());
-            stmt.setTimestamp(11, vehicleDto.getAcquisitionDate() != null ?
-                Timestamp.valueOf(vehicleDto.getAcquisitionDate()) : null);
-            stmt.setString(12, vehicleDto.getStatus());
-            stmt.setObject(13, vehicleDto.getUuid());
+            stmt.setString(1, vehicleDto.licensePlate());
+            stmt.setString(2, vehicleDto.manufacturer());
+            stmt.setString(3, vehicleDto.model());
+            stmt.setString(4, vehicleDto.energy());
+            stmt.setInt(5, vehicleDto.power());
+            stmt.setInt(6, vehicleDto.seats());
+            stmt.setInt(7, vehicleDto.capacity());
+            stmt.setInt(8, vehicleDto.utilityWeight());
+            stmt.setString(9, vehicleDto.color());
+            stmt.setInt(10, vehicleDto.kilometers());
+            stmt.setTimestamp(11, vehicleDto.acquisitionDate() != null ?
+                Timestamp.valueOf(vehicleDto.acquisitionDate()) : null);
+            stmt.setString(12, vehicleDto.status());
+            stmt.setObject(13, vehicleDto.uuid());
 
             stmt.executeUpdate();
 
         } catch (SQLException e) {
-            throw new RuntimeException("Failed to update vehicle with UUID: " + vehicleDto.getUuid(), e);
+            throw new RuntimeException("Failed to update vehicle with UUID: " + vehicleDto.uuid(), e);
         } catch (DatabaseException e) {
             throw new RuntimeException("Database connection error while updating vehicle", e);
         }

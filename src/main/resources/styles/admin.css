@@ -1,0 +1,157 @@
+.admin-panel-container {
+    -fx-background-color: -fx-bg-primary;
+    -fx-padding: 10px;
+}
+
+.admin-panel-title {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-text-primary;
+}
+
+.admin-list-container {
+    -fx-background-color: -fx-bg-secondary;
+    -fx-padding: 10px;
+    -fx-spacing: 10px;
+}
+
+.admin-list-title {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-text-primary;
+}
+
+.admin-button-box {
+    -fx-spacing: 5px;
+    -fx-padding: 5px 0;
+}
+
+.admin-add-button {
+    -fx-background-color: -fx-color-success;
+    -fx-text-fill: -fx-text-white;
+    -fx-font-weight: bold;
+    -fx-padding: 8px 12px;
+    -fx-background-radius: 4px;
+    -fx-min-width: 85px;
+    -fx-pref-width: -1;
+    -fx-max-width: Infinity;
+}
+
+.admin-add-button:hover {
+    -fx-background-color: -fx-color-success-hover;
+}
+
+.admin-edit-button {
+    -fx-background-color: -fx-color-primary;
+    -fx-text-fill: -fx-text-white;
+    -fx-font-weight: bold;
+    -fx-padding: 8px 12px;
+    -fx-background-radius: 4px;
+    -fx-min-width: 85px;
+    -fx-pref-width: -1;
+    -fx-max-width: Infinity;
+}
+
+.admin-edit-button:hover {
+    -fx-background-color: -fx-color-hover;
+}
+
+.admin-delete-button {
+    -fx-background-color: -fx-color-error;
+    -fx-text-fill: -fx-text-white;
+    -fx-font-weight: bold;
+    -fx-padding: 8px 12px;
+    -fx-background-radius: 4px;
+    -fx-min-width: 85px;
+    -fx-pref-width: -1;
+    -fx-max-width: Infinity;
+}
+
+.admin-delete-button:hover {
+    -fx-background-color: -fx-color-error-hover;
+}
+
+.admin-refresh-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: -fx-color-primary;
+    -fx-border-color: -fx-color-primary;
+    -fx-border-width: 1px;
+    -fx-border-radius: 4px;
+    -fx-background-radius: 4px;
+    -fx-padding: 8px 12px;
+    -fx-min-width: 85px;
+    -fx-pref-width: -1;
+    -fx-max-width: Infinity;
+}
+
+.admin-refresh-button:hover {
+    -fx-background-color: -fx-bg-hover;
+}
+
+.admin-details-pane {
+    -fx-background-color: -fx-bg-white;
+    -fx-padding: 20px;
+}
+
+.admin-details-title {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-text-primary;
+}
+
+.admin-detail-label {
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-text-secondary;
+    -fx-font-size: 13px;
+}
+
+.admin-detail-value {
+    -fx-text-fill: -fx-text-primary;
+    -fx-font-size: 13px;
+}
+
+.admin-message-box {
+    -fx-padding: 10px;
+    -fx-spacing: 5px;
+}
+
+.admin-error-label {
+    -fx-text-fill: -fx-color-error;
+    -fx-font-weight: bold;
+}
+
+.admin-success-label {
+    -fx-text-fill: -fx-color-success;
+    -fx-font-weight: bold;
+}
+
+.admin-approve-button {
+    -fx-background-color: -fx-color-success;
+    -fx-text-fill: -fx-text-white;
+    -fx-font-weight: bold;
+    -fx-padding: 10px 16px;
+    -fx-background-radius: 4px;
+    -fx-min-width: 100px;
+    -fx-pref-width: -1;
+    -fx-max-width: Infinity;
+}
+
+.admin-approve-button:hover {
+    -fx-background-color: -fx-color-success-hover;
+}
+
+.admin-reject-button {
+    -fx-background-color: -fx-color-error;
+    -fx-text-fill: -fx-text-white;
+    -fx-font-weight: bold;
+    -fx-padding: 10px 16px;
+    -fx-background-radius: 4px;
+    -fx-min-width: 100px;
+    -fx-pref-width: -1;
+    -fx-max-width: Infinity;
+}
+
+.admin-reject-button:hover {
+    -fx-background-color: -fx-color-error-hover;
+}
+

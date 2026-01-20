@@ -27,8 +27,8 @@ public class VehicleSelectorController {
         Task<List<Vehicle>> task = interactor.createLoadVehiclesTask();
 
         task.setOnSucceeded(event -> {
-            model.getVehicles().clear();
-            model.getVehicles().addAll(task.getValue());
+            model.vehiclesProperty().clear();
+            model.vehiclesProperty().addAll(task.getValue());
         });
 
         task.setOnFailed(event -> {
@@ -58,8 +58,8 @@ public class VehicleSelectorController {
         }
 
         Task<Boolean> task = interactor.createReservationTask(
-            SessionManager.getInstance().getCurrentAgent().getUuid(),
-            model.getSelectedVehicle().getUuid(),
+            SessionManager.getInstance().getCurrentAgent().uuid(),
+            model.getSelectedVehicle().uuid(),
             model.getReservationStartDate(),
             model.getReservationEndDate()
         );

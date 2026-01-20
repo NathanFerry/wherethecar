@@ -1,53 +1,40 @@
 package groupe1.il3.app.persistence.dto.reservation;
 
+import groupe1.il3.app.domain.agent.Agent;
+import groupe1.il3.app.domain.reservation.Reservation;
+import groupe1.il3.app.domain.reservation.ReservationStatus;
+import groupe1.il3.app.domain.vehicle.Vehicle;
+
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-public class ReservationDto {
-    private final UUID uuid;
-    private final UUID agentUuid;
-    private final UUID vehicleUuid;
-    private final LocalDateTime start;
-    private final LocalDateTime end;
-    private final String status;
-
-    public ReservationDto(
+public record ReservationDto(
         UUID uuid,
         UUID agentUuid,
         UUID vehicleUuid,
         LocalDateTime start,
         LocalDateTime end,
         String status
-    ) {
-        this.uuid = uuid;
-        this.agentUuid = agentUuid;
-        this.vehicleUuid = vehicleUuid;
-        this.start = start;
-        this.end = end;
-        this.status = status;
+) {
+    public static ReservationDto fromDomainObject(Reservation reservation) {
+        return new ReservationDto(
+                reservation.uuid(),
+                reservation.agent().uuid(),
+                reservation.vehicle().uuid(),
+                reservation.startDate(),
+                reservation.endDate(),
+                reservation.status().toString().toLowerCase()
+        );
     }
 
-    public UUID getUuid() {
-        return uuid;
-    }
-
-    public UUID getAgentUuid() {
-        return agentUuid;
-    }
-
-    public UUID getVehicleUuid() {
-        return vehicleUuid;
-    }
-
-    public LocalDateTime getStart() {
-        return start;
-    }
-
-    public LocalDateTime getEnd() {
-        return end;
-    }
-
-    public String getStatus() {
-        return status;
+    public Reservation toDomainObject(Agent agent, Vehicle vehicle) {
+        return new Reservation(
+                this.uuid,
+                agent,
+                vehicle,
+                this.start,
+                this.end,
+                ReservationStatus.valueOf(this.status.toUpperCase())
+        );
     }
 }

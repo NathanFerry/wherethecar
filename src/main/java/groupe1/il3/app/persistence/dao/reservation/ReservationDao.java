@@ -9,6 +9,8 @@ import java.util.UUID;
 public interface ReservationDao {
     public ReservationDto getReservationById(UUID uuid);
     public List<ReservationDto> getAllReservations();
-    public List<ReservationDto> getReservationsByAgentUuid(UUID agentUuid);
+    public List<ReservationDto> getActiveReservationsByAgentUuid(UUID agentUuid);
+    public List<ReservationDto> getHistoricalReservationsByAgentUuid(UUID agentUuid);
     public void createReservation(UUID uuid, UUID agentUuid, UUID vehicleUuid, LocalDateTime startDate, LocalDateTime endDate, String status);
+    public void updateReservationStatus(UUID reservationUuid, String status);
 }

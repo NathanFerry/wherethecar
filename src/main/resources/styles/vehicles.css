@@ -1,0 +1,113 @@
+.vehicle-list-container {
+    -fx-background-color: -fx-bg-secondary;
+    -fx-padding: 10px;
+    -fx-spacing: 10px;
+}
+
+.vehicle-list-title {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-text-primary;
+}
+
+.vehicle-list-cell {
+    -fx-background-color: -fx-bg-white;
+    -fx-border-color: -fx-border-default;
+    -fx-border-width: 1px;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-padding: 10px;
+    -fx-spacing: 5px;
+}
+
+.vehicle-list-cell:hover {
+    -fx-background-color: -fx-bg-light-gray;
+    -fx-border-color: -fx-color-primary;
+}
+
+.vehicle-list-cell:selected {
+    -fx-background-color: -fx-bg-hover;
+    -fx-border-color: -fx-color-primary;
+    -fx-border-width: 2px;
+}
+
+.vehicle-manufacturer {
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-text-primary;
+}
+
+.vehicle-license-plate {
+    -fx-font-size: 13px;
+    -fx-text-fill: -fx-text-secondary;
+}
+
+.vehicle-status-available {
+    -fx-text-fill: -fx-color-success;
+    -fx-font-weight: bold;
+}
+
+.vehicle-status-reserved {
+    -fx-text-fill: -fx-color-warning;
+    -fx-font-weight: bold;
+}
+
+.vehicle-status-maintenance {
+    -fx-text-fill: -fx-color-error;
+    -fx-font-weight: bold;
+}
+
+.vehicle-details-pane {
+    -fx-background-color: -fx-bg-white;
+    -fx-padding: 20px;
+}
+
+.vehicle-details-title {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-text-primary;
+}
+
+.vehicle-detail-label {
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-text-secondary;
+    -fx-font-size: 13px;
+}
+
+.vehicle-detail-value {
+    -fx-text-fill: -fx-text-primary;
+    -fx-font-size: 13px;
+}
+
+.vehicle-reserve-button {
+    -fx-background-color: -fx-color-primary;
+    -fx-text-fill: -fx-text-white;
+    -fx-font-weight: bold;
+    -fx-font-size: 15px;
+    -fx-padding: 12px 20px;
+    -fx-background-radius: 5px;
+}
+
+.vehicle-reserve-button:hover {
+    -fx-background-color: -fx-color-hover;
+}
+
+.vehicle-reserve-button:disabled {
+    -fx-background-color: -fx-disabled-bg;
+    -fx-text-fill: -fx-disabled-text;
+}
+
+.vehicle-refresh-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: -fx-color-primary;
+    -fx-border-color: -fx-color-primary;
+    -fx-border-width: 1px;
+    -fx-border-radius: 4px;
+    -fx-background-radius: 4px;
+    -fx-padding: 8px 16px;
+}
+
+.vehicle-refresh-button:hover {
+    -fx-background-color: -fx-bg-hover;
+}
+

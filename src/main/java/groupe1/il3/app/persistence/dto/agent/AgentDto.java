@@ -1,52 +1,36 @@
 package groupe1.il3.app.persistence.dto.agent;
 
+import groupe1.il3.app.domain.agent.Agent;
+
 import java.util.UUID;
 
-public class AgentDto {
-    private final UUID uuid;
-    private final String firstName;
-    private final String lastName;
-    private final String email;
-    private final String passwordHash;
-    private final Boolean isAdmin;
-
-    public AgentDto(
+public record AgentDto(
         UUID uuid,
         String firstName,
         String lastName,
         String email,
         String passwordHash,
         Boolean isAdmin
-    ) {
-        this.uuid = uuid;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-        this.passwordHash = passwordHash;
-        this.isAdmin = isAdmin;
+) {
+    public static AgentDto fromDomainObject(Agent agent) {
+        return new AgentDto(
+                agent.uuid(),
+                agent.firstname(),
+                agent.lastname(),
+                agent.email(),
+                agent.passwordHash(),
+                agent.isAdmin()
+        );
     }
 
-    public UUID getUuid() {
-        return uuid;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getPasswordHash() {
-        return passwordHash;
-    }
-
-    public Boolean getIsAdmin() {
-        return isAdmin;
+    public Agent toDomainObject() {
+        return new Agent(
+                this.uuid,
+                this.firstName,
+                this.lastName,
+                this.email,
+                this.passwordHash,
+                this.isAdmin
+        );
     }
 }

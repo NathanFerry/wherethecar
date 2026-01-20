@@ -2,6 +2,7 @@ package groupe1.il3.app.persistence.broker.reservation;
 
 import groupe1.il3.app.domain.agent.Agent;
 import groupe1.il3.app.domain.reservation.Reservation;
+import groupe1.il3.app.domain.reservation.ReservationStatus;
 import groupe1.il3.app.domain.vehicle.Status;
 import groupe1.il3.app.domain.vehicle.Vehicle;
 import groupe1.il3.app.persistence.broker.agent.AgentBroker;
@@ -38,7 +39,13 @@ public class ReservationBroker {
     }
 
     public List<Reservation> getReservationsByAgentUuid(UUID agentUuid) {
-        return reservationDao.getReservationsByAgentUuid(agentUuid).stream()
+        return reservationDao.getActiveReservationsByAgentUuid(agentUuid).stream()
+                .map(this::convertToReservation)
+                .collect(Collectors.toList());
+    }
+
+    public List<Reservation> getHistoricalReservationsByAgentUuid(UUID agentUuid) {
+        return reservationDao.getHistoricalReservationsByAgentUuid(agentUuid).stream()
                 .map(this::convertToReservation)
                 .collect(Collectors.toList());
     }
@@ -46,20 +53,70 @@ public class ReservationBroker {
     public void createReservation(UUID agentUuid, UUID vehicleUuid, LocalDateTime startDate, LocalDateTime endDate) {
         UUID reservationUuid = UUID.randomUUID();
         reservationDao.createReservation(reservationUuid, agentUuid, vehicleUuid, startDate, endDate, "pending");
+    }
 
+    public void returnVehicle(UUID reservationUuid, UUID vehicleUuid, int newKilometers) {
+        reservationDao.updateReservationStatus(reservationUuid, "completed");
+
+        Vehicle vehicle = vehicleBroker.getVehicleById(vehicleUuid);
+        if (vehicle != null) {
+            Vehicle updatedVehicle = new Vehicle(
+                vehicle.uuid(),
+                vehicle.licencePlate(),
+                vehicle.manufacturer(),
+                vehicle.model(),
+                vehicle.energy(),
+                vehicle.power(),
+                vehicle.seats(),
+                vehicle.capacity(),
+                vehicle.utilityWeight(),
+                vehicle.color(),
+                newKilometers,
+                vehicle.acquisitionDate(),
+                Status.AVAILABLE
+            );
+            vehicleBroker.updateVehicle(updatedVehicle);
+        }
+    }
+
+    public List<Reservation> getPendingReservations() {
+        return reservationDao.getAllReservations().stream()
+                .filter(dto -> "pending".equals(dto.status()))
+                .map(this::convertToReservation)
+                .collect(Collectors.toList());
+    }
+
+    public void approveReservation(UUID reservationUuid, UUID vehicleUuid) {
+        reservationDao.updateReservationStatus(reservationUuid, "confirmed");
         vehicleBroker.updateVehicleStatus(vehicleUuid, Status.RESERVED);
     }
 
+    public void cancelReservation(UUID reservationUuid) {
+        reservationDao.updateReservationStatus(reservationUuid, "cancelled");
+    }
+
     private Reservation convertToReservation(ReservationDto dto) {
-        Agent agent = agentBroker.getAgentById(dto.getAgentUuid());
-        Vehicle vehicle = vehicleBroker.getVehicleById(dto.getVehicleUuid());
+        Agent agent = agentBroker.getAgentById(dto.agentUuid());
+        Vehicle vehicle = vehicleBroker.getVehicleById(dto.vehicleUuid());
 
         return new Reservation(
-                dto.getUuid(),
+                dto.uuid(),
                 agent,
                 vehicle,
-                dto.getStart(),
-                dto.getEnd()
+                dto.start(),
+                dto.end(),
+                mapStringToReservationStatus(dto.status())
         );
+    }
+
+    private ReservationStatus mapStringToReservationStatus(String status) {
+        if (status == null) return ReservationStatus.PENDING;
+        return switch (status.toLowerCase()) {
+            case "pending" -> ReservationStatus.PENDING;
+            case "confirmed" -> ReservationStatus.CONFIRMED;
+            case "cancelled" -> ReservationStatus.CANCELLED;
+            case "completed" -> ReservationStatus.COMPLETED;
+            default -> ReservationStatus.PENDING;
+        };
     }
 }

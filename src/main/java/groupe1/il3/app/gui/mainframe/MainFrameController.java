@@ -1,6 +1,7 @@
 package groupe1.il3.app.gui.mainframe;
 
 import groupe1.il3.app.gui.admin.AdminPanelController;
+import groupe1.il3.app.gui.history.HistoryController;
 import groupe1.il3.app.gui.reservations.ReservationsController;
 import groupe1.il3.app.gui.vehicleselector.VehicleSelectorController;
 import javafx.scene.layout.Region;
@@ -10,10 +11,12 @@ public class MainFrameController {
 
     private final Builder<Region> viewBuilder;
     private final MainFrameModel model;
+    private final Runnable onLogout;
 
-    public MainFrameController() {
+    public MainFrameController(Runnable onLogout) {
         this.model = new MainFrameModel();
-        this.viewBuilder = new MainFrameViewBuilder(this.model, this::showVehicleList, this::showReservations, this::showAdminPanel);
+        this.onLogout = onLogout;
+        this.viewBuilder = new MainFrameViewBuilder(this.model, this::showVehicleList, this::showReservations, this::showHistory, this::showAdminPanel, onLogout);
     }
 
     public Region getView() {
@@ -28,6 +31,11 @@ public class MainFrameController {
     public void showReservations() {
         ReservationsController reservationsController = new ReservationsController();
         model.setCenterContent(reservationsController.getView());
+    }
+
+    public void showHistory() {
+        HistoryController historyController = new HistoryController();
+        model.setCenterContent(historyController.getView());
     }
 
     public void showAdminPanel() {
