@@ -1,6 +1,7 @@
 package groupe1.il3.app.gui.login;
 
 import groupe1.il3.app.domain.agent.Agent;
+import groupe1.il3.app.domain.authentication.AuthResult;
 import groupe1.il3.app.domain.authentication.SessionManager;
 import javafx.concurrent.Task;
 import javafx.scene.layout.Region;
@@ -48,19 +49,26 @@ public class LoginController {
      * Creates and manages an authentication task.
      */
     private void handleLogin() {
+        // Prepare the model on the FX thread
+        interactor.prepareAuthentication();
+
         // Create authentication task that calls the interactor
-        Task<Agent> authTask = new Task<>() {
+        Task<AuthResult> authTask = new Task<>() {
             @Override
-            protected Agent call() {
-                // Interactor handles authentication and model updates
-                return interactor.authenticate();
+            protected AuthResult call() {
+                // Fetch and validate credentials on background thread
+                return interactor.fetchAndValidateCredentials();
             }
         };
 
         // Handle task completion
         authTask.setOnSucceeded(event -> {
-            Agent authenticatedAgent = authTask.getValue();
+            AuthResult result = authTask.getValue();
 
+            // Update model with results on FX thread
+            interactor.updateModelWithResult(result);
+
+            Agent authenticatedAgent = result.agent();
             if (authenticatedAgent != null) {
                 // Store the authenticated agent in the session
                 SessionManager.getInstance().setCurrentAgent(authenticatedAgent);
@@ -70,13 +78,14 @@ public class LoginController {
                     onLoginSuccess.accept(authenticatedAgent);
                 }
             }
-            // If authentication failed, interactor has already updated the model with error message
         });
 
         // Handle task failure (exceptions)
         authTask.setOnFailed(event -> {
             Throwable exception = authTask.getException();
             exception.printStackTrace();
+            // Reset login in progress state on error
+            interactor.updateModelWithResult(new AuthResult(null, "Une erreur est survenue."));
         });
 
         // Start the authentication task in a background thread
