@@ -10,13 +10,12 @@ import javafx.util.Builder;
 import java.util.List;
 
 public class ReservationsController {
-    private final ReservationsModel model;
     private final ReservationsInteractor interactor;
     private final Builder<Region> viewBuilder;
 
     public ReservationsController() {
-        this.model = new ReservationsModel();
-        this.interactor = new ReservationsInteractor();
+        ReservationsModel model = new ReservationsModel();
+        this.interactor = new ReservationsInteractor(model);
         this.viewBuilder = new ReservationsViewBuilder(model, this::loadReservations, this::returnVehicle);
     }
 
@@ -32,17 +31,21 @@ public class ReservationsController {
             return;
         }
 
-        model.setLoading(true);
-        Task<List<Reservation>> task = interactor.createLoadReservationsTask(currentAgent.uuid());
+        interactor.setLoading(true);
+
+        Task<List<Reservation>> task = new Task<>() {
+            @Override
+            protected List<Reservation> call() {
+                return interactor.loadReservations(currentAgent.uuid());
+            }
+        };
 
         task.setOnSucceeded(event -> {
-            model.setLoading(false);
-            model.reservationsProperty().clear();
-            model.reservationsProperty().addAll(task.getValue());
+            interactor.updateModelWithReservations(task.getValue());
         });
 
         task.setOnFailed(event -> {
-            model.setLoading(false);
+            interactor.setLoading(false);
             System.err.println("Failed to load reservations: " + task.getException().getMessage());
             task.getException().printStackTrace();
         });
@@ -51,40 +54,32 @@ public class ReservationsController {
     }
 
     private void returnVehicle() {
-        model.setReturnErrorMessage("");
-
-        Reservation selectedReservation = model.getSelectedReservation();
-        if (selectedReservation == null) {
-            model.setReturnErrorMessage("Aucune réservation sélectionnée");
+        if (!interactor.validateReturn()) {
             return;
         }
 
-        if (selectedReservation.vehicle() == null) {
-            model.setReturnErrorMessage("Véhicule non disponible");
-            return;
-        }
+        Reservation selectedReservation = interactor.getSelectedReservation();
+        int newKilometers = interactor.getNewKilometers();
 
-        int currentKilometers = selectedReservation.vehicle().kilometers();
-        int newKilometers = model.getNewKilometers();
-
-        if (newKilometers < currentKilometers) {
-            model.setReturnErrorMessage("Le nouveau kilométrage doit être supérieur ou égal au kilométrage actuel (" + currentKilometers + " km)");
-            return;
-        }
-
-        Task<Void> task = interactor.createReturnVehicleTask(
-            selectedReservation.uuid(),
-            selectedReservation.vehicle().uuid(),
-            newKilometers
-        );
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() {
+                interactor.returnVehicle(
+                    selectedReservation.uuid(),
+                    selectedReservation.vehicle().uuid(),
+                    newKilometers
+                );
+                return null;
+            }
+        };
 
         task.setOnSucceeded(event -> {
-            model.setReturnErrorMessage("");
+            interactor.clearReturnError();
             loadReservations();
         });
 
         task.setOnFailed(event -> {
-            model.setReturnErrorMessage("Erreur lors du retour du véhicule");
+            interactor.setReturnError("Erreur lors du retour du véhicule");
             System.err.println("Failed to return vehicle: " + task.getException().getMessage());
             task.getException().printStackTrace();
         });
