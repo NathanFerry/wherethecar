@@ -1,6 +1,7 @@
 package groupe1.il3.app.gui.header;
 
 import groupe1.il3.app.gui.style.StyleApplier;
+import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -58,6 +59,10 @@ public class HeaderViewBuilder implements Builder<Region> {
     }
 
     public Dialog<ButtonType> buildEditDialog() {
+        return buildEditDialog(null);
+    }
+
+    public Dialog<ButtonType> buildEditDialog(Runnable onSave) {
         Dialog<ButtonType> dialog = new Dialog<>();
         dialog.setTitle("Modifier les informations");
         dialog.setHeaderText("Modifier votre email et/ou mot de passe");
@@ -113,6 +118,13 @@ public class HeaderViewBuilder implements Builder<Region> {
 
         Button saveButton = (Button) dialog.getDialogPane().lookupButton(saveButtonType);
         saveButton.disableProperty().bind(model.updateInProgressProperty());
+
+        if (onSave != null) {
+            saveButton.addEventFilter(ActionEvent.ACTION, event -> {
+                onSave.run();
+                event.consume();
+            });
+        }
 
         return dialog;
     }
