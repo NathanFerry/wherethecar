@@ -11,11 +11,10 @@ import java.util.function.Consumer;
 /**
  * Controller for the login view.
  * Coordinates between the Model, View, and Interactor.
- * Handles user actions and manages the authentication flow.
+ * Handles user actions, manages task orchestration, and controls the authentication flow.
  */
 public class LoginController {
 
-    private final LoginModel model;
     private final LoginInteractor interactor;
     private final Builder<Region> viewBuilder;
     private final Consumer<Agent> onLoginSuccess;
@@ -26,8 +25,11 @@ public class LoginController {
      * @param onLoginSuccess callback to execute when login is successful, receives the authenticated Agent
      */
     public LoginController(Consumer<Agent> onLoginSuccess) {
-        this.model = new LoginModel();
-        this.interactor = new LoginInteractor();
+        // Create the model
+        LoginModel model = new LoginModel();
+
+        // Pass the model to interactor and viewbuilder, then forget about it
+        this.interactor = new LoginInteractor(model);
         this.viewBuilder = new LoginViewBuilder(model, this::handleLogin);
         this.onLoginSuccess = onLoginSuccess;
     }
@@ -43,23 +45,20 @@ public class LoginController {
 
     /**
      * Handles the login button action.
-     * Creates an authentication task and processes the result.
+     * Creates and manages an authentication task.
      */
     private void handleLogin() {
-        // Clear any previous error messages
-        model.setErrorMessage("");
-        model.setLoginInProgress(true);
+        // Create authentication task that calls the interactor
+        Task<Agent> authTask = new Task<>() {
+            @Override
+            protected Agent call() {
+                // Interactor handles authentication and model updates
+                return interactor.authenticate();
+            }
+        };
 
-        // Get credentials from model
-        String email = model.getEmail();
-        String password = model.getPassword();
-
-        // Create authentication task
-        Task<Agent> authTask = interactor.createAuthenticationTask(email, password);
-
-        // Handle successful authentication
+        // Handle task completion
         authTask.setOnSucceeded(event -> {
-            model.setLoginInProgress(false);
             Agent authenticatedAgent = authTask.getValue();
 
             if (authenticatedAgent != null) {
@@ -70,17 +69,13 @@ public class LoginController {
                 if (onLoginSuccess != null) {
                     onLoginSuccess.accept(authenticatedAgent);
                 }
-            } else {
-                // Authentication failed
-                model.setErrorMessage("Email ou mot de passe incorrect.");
             }
+            // If authentication failed, interactor has already updated the model with error message
         });
 
-        // Handle authentication failure
+        // Handle task failure (exceptions)
         authTask.setOnFailed(event -> {
-            model.setLoginInProgress(false);
             Throwable exception = authTask.getException();
-            model.setErrorMessage("Erreur lors de la connexion: " + exception.getMessage());
             exception.printStackTrace();
         });
 
