@@ -11,14 +11,13 @@ import java.util.function.BiConsumer;
 
 public class AgentManagementController {
 
-    private final AgentManagementModel model;
     private final AgentManagementInteractor interactor;
     private final Builder<Region> viewBuilder;
     private final BiConsumer<String, String> messageHandler;
 
     public AgentManagementController(BiConsumer<String, String> messageHandler) {
-        this.model = new AgentManagementModel();
-        this.interactor = new AgentManagementInteractor();
+        AgentManagementModel model = new AgentManagementModel();
+        this.interactor = new AgentManagementInteractor(model);
         this.messageHandler = messageHandler;
         this.viewBuilder = new AgentManagementViewBuilder(
             model,
@@ -36,11 +35,15 @@ public class AgentManagementController {
     public void loadAgents() {
         messageHandler.accept("", "");
 
-        Task<List<Agent>> task = interactor.createLoadAgentsTask();
+        Task<List<Agent>> task = new Task<>() {
+            @Override
+            protected List<Agent> call() {
+                return interactor.fetchAllAgents();
+            }
+        };
 
         task.setOnSucceeded(event -> {
-            model.agentsProperty().clear();
-            model.agentsProperty().addAll(task.getValue());
+            interactor.updateAgentsList(task.getValue());
         });
 
         task.setOnFailed(event -> {
@@ -54,7 +57,13 @@ public class AgentManagementController {
     private void addAgent(Agent agent) {
         messageHandler.accept("", "");
 
-        Task<Void> task = interactor.createAgentTask(agent);
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() {
+                interactor.createAgent(agent);
+                return null;
+            }
+        };
 
         task.setOnSucceeded(event -> {
             messageHandler.accept("", "Agent ajouté avec succès");
@@ -72,7 +81,13 @@ public class AgentManagementController {
     private void editAgent(Agent agent) {
         messageHandler.accept("", "");
 
-        Task<Void> task = interactor.updateAgentTask(agent);
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() {
+                interactor.updateAgent(agent);
+                return null;
+            }
+        };
 
         task.setOnSucceeded(event -> {
             messageHandler.accept("", "Agent modifié avec succès");
@@ -90,7 +105,13 @@ public class AgentManagementController {
     private void deleteAgent(UUID agentUuid) {
         messageHandler.accept("", "");
 
-        Task<Void> task = interactor.deleteAgentTask(agentUuid);
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() {
+                interactor.deleteAgent(agentUuid);
+                return null;
+            }
+        };
 
         task.setOnSucceeded(event -> {
             messageHandler.accept("", "Agent supprimé avec succès");

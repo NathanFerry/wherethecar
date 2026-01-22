@@ -8,26 +8,22 @@ import javafx.util.Builder;
 
 public class AdminPanelController {
 
-    private final AdminPanelModel model;
     private final AdminPanelInteractor interactor;
-    private final VehicleManagementController vehicleManagementController;
-    private final AgentManagementController agentManagementController;
-    private final ReservationManagementController reservationManagementController;
     private final Builder<Region> viewBuilder;
 
     public AdminPanelController() {
-        this.model = new AdminPanelModel();
-        this.interactor = new AdminPanelInteractor();
+        AdminPanelModel model = new AdminPanelModel();
+        this.interactor = new AdminPanelInteractor(model);
 
-        this.vehicleManagementController = new VehicleManagementController(this::handleMessages);
-        this.agentManagementController = new AgentManagementController(this::handleMessages);
-        this.reservationManagementController = new ReservationManagementController(this::handleMessages);
+        VehicleManagementController vehicleManagementController = new VehicleManagementController(this::handleMessages);
+        AgentManagementController agentManagementController = new AgentManagementController(this::handleMessages);
+        ReservationManagementController reservationManagementController = new ReservationManagementController(this::handleMessages);
 
         this.viewBuilder = new AdminPanelViewBuilder(
             model,
-            vehicleManagementController,
-            agentManagementController,
-            reservationManagementController
+                vehicleManagementController,
+                agentManagementController,
+                reservationManagementController
         );
     }
 
@@ -36,7 +32,6 @@ public class AdminPanelController {
     }
 
     private void handleMessages(String errorMessage, String successMessage) {
-        model.setErrorMessage(errorMessage);
-        model.setSuccessMessage(successMessage);
+        interactor.updateMessages(errorMessage, successMessage);
     }
 }

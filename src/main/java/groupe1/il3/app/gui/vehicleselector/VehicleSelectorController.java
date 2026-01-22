@@ -10,13 +10,12 @@ import javafx.util.Builder;
 import java.util.List;
 
 public class VehicleSelectorController {
-    private final VehicleSelectorModel model;
     private final VehicleSelectorInteractor interactor;
     private final Builder<Region> viewBuilder;
 
     public VehicleSelectorController() {
-        this.model = new VehicleSelectorModel();
-        this.interactor = new VehicleSelectorInteractor();
+        VehicleSelectorModel model = new VehicleSelectorModel();
+        this.interactor = new VehicleSelectorInteractor(model);
         this.viewBuilder = new VehicleSelectorViewBuilder(model, this::loadVehicles, this::reserveVehicle, this::loadVehicleReservations);
     }
 
@@ -25,11 +24,15 @@ public class VehicleSelectorController {
     }
 
     private void loadVehicles() {
-        Task<List<Vehicle>> task = interactor.createLoadVehiclesTask();
+        Task<List<Vehicle>> task = new Task<>() {
+            @Override
+            protected List<Vehicle> call() {
+                return interactor.loadVehicles();
+            }
+        };
 
         task.setOnSucceeded(event -> {
-            model.vehiclesProperty().clear();
-            model.vehiclesProperty().addAll(task.getValue());
+            interactor.updateModelWithVehicles(task.getValue());
         });
 
         task.setOnFailed(event -> {
@@ -41,16 +44,22 @@ public class VehicleSelectorController {
     }
 
     private void loadVehicleReservations() {
-        if (model.getSelectedVehicle() == null) {
-            model.selectedVehicleReservationsProperty().clear();
-            return;
-        }
-
-        Task<List<Reservation>> task = interactor.createLoadVehicleReservationsTask(model.getSelectedVehicle().uuid());
+        Task<List<Reservation>> task = new Task<>() {
+            @Override
+            protected List<Reservation> call() {
+                if (!interactor.hasSelectedVehicle()) {
+                    return null;
+                }
+                return interactor.loadVehicleReservations(interactor.getSelectedVehicleUuid());
+            }
+        };
 
         task.setOnSucceeded(event -> {
-            model.selectedVehicleReservationsProperty().clear();
-            model.selectedVehicleReservationsProperty().addAll(task.getValue());
+            if (task.getValue() != null) {
+                interactor.updateModelWithReservations(task.getValue());
+            } else {
+                interactor.clearReservations();
+            }
         });
 
         task.setOnFailed(event -> {
@@ -62,46 +71,34 @@ public class VehicleSelectorController {
     }
 
     private void reserveVehicle() {
-        model.setReservationErrorMessage("");
-        model.setReservationSuccessful(false);
-
-        if (model.getSelectedVehicle() == null) {
-            model.setReservationErrorMessage("Veuillez sélectionner un véhicule");
+        if (!interactor.validateReservation()) {
             return;
         }
 
-        if (model.getReservationStartDate() == null || model.getReservationEndDate() == null) {
-            model.setReservationErrorMessage("Veuillez sélectionner les dates de début et de fin");
-            return;
-        }
-
-        if (model.getReservationEndDate().isBefore(model.getReservationStartDate())) {
-            model.setReservationErrorMessage("La date de fin doit être après la date de début");
-            return;
-        }
-
-        Task<Boolean> task = interactor.createReservationTask(
-            SessionManager.getInstance().getCurrentAgent().uuid(),
-            model.getSelectedVehicle().uuid(),
-            model.getReservationStartDate(),
-            model.getReservationEndDate()
-        );
+        Task<Boolean> task = new Task<>() {
+            @Override
+            protected Boolean call() {
+                return interactor.createReservation(
+                    SessionManager.getInstance().getCurrentAgent().uuid(),
+                    interactor.getSelectedVehicleUuid(),
+                    interactor.getReservationStartDate(),
+                    interactor.getReservationEndDate()
+                );
+            }
+        };
 
         task.setOnSucceeded(event -> {
             if (task.getValue()) {
-                model.setReservationErrorMessage("");
-                model.setReservationSuccessful(true);
+                interactor.setReservationSuccess();
                 loadVehicles();
-                loadVehicleReservations(); // Reload reservations to show the new one
+                loadVehicleReservations();
             } else {
-                model.setReservationErrorMessage("Ce véhicule est déjà réservé pour cette période");
-                model.setReservationSuccessful(false);
+                interactor.setReservationError("Ce véhicule est déjà réservé pour cette période");
             }
         });
 
         task.setOnFailed(event -> {
-            model.setReservationErrorMessage("Erreur lors de la création de la réservation");
-            model.setReservationSuccessful(false);
+            interactor.setReservationError("Erreur lors de la création de la réservation");
             System.err.println("Failed to create reservation: " + task.getException().getMessage());
             task.getException().printStackTrace();
         });

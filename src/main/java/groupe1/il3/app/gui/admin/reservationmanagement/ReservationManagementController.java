@@ -11,14 +11,13 @@ import java.util.function.BiConsumer;
 
 public class ReservationManagementController {
 
-    private final ReservationManagementModel model;
     private final ReservationManagementInteractor interactor;
     private final Builder<Region> viewBuilder;
     private final BiConsumer<String, String> messageHandler;
 
     public ReservationManagementController(BiConsumer<String, String> messageHandler) {
-        this.model = new ReservationManagementModel();
-        this.interactor = new ReservationManagementInteractor();
+        ReservationManagementModel model = new ReservationManagementModel();
+        this.interactor = new ReservationManagementInteractor(model);
         this.messageHandler = messageHandler;
         this.viewBuilder = new ReservationManagementViewBuilder(
             model,
@@ -35,11 +34,15 @@ public class ReservationManagementController {
     public void loadPendingReservations() {
         messageHandler.accept("", "");
 
-        Task<List<Reservation>> task = interactor.createLoadPendingReservationsTask();
+        Task<List<Reservation>> task = new Task<>() {
+            @Override
+            protected List<Reservation> call() {
+                return interactor.fetchPendingReservations();
+            }
+        };
 
         task.setOnSucceeded(event -> {
-            model.pendingReservationsProperty().clear();
-            model.pendingReservationsProperty().addAll(task.getValue());
+            interactor.updatePendingReservationsList(task.getValue());
         });
 
         task.setOnFailed(event -> {
@@ -53,7 +56,13 @@ public class ReservationManagementController {
     private void approveReservation(UUID reservationUuid, UUID vehicleUuid) {
         messageHandler.accept("", "");
 
-        Task<Void> task = interactor.approveReservationTask(reservationUuid, vehicleUuid);
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() {
+                interactor.approveReservation(reservationUuid, vehicleUuid);
+                return null;
+            }
+        };
 
         task.setOnSucceeded(event -> {
             messageHandler.accept("", "Réservation approuvée avec succès");
@@ -71,7 +80,13 @@ public class ReservationManagementController {
     private void cancelReservation(UUID reservationUuid) {
         messageHandler.accept("", "");
 
-        Task<Void> task = interactor.cancelReservationTask(reservationUuid);
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() {
+                interactor.cancelReservation(reservationUuid);
+                return null;
+            }
+        };
 
         task.setOnSucceeded(event -> {
             messageHandler.accept("", "Réservation refusée avec succès");
