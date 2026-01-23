@@ -31,18 +31,31 @@ public class MainFrameViewBuilder implements Builder<Region> {
         BorderPane panel = new BorderPane();
         panel.setPrefSize(1200, 800);
 
+        this.setupHeader(panel);
+        this.setupNavigation(panel);
+        this.setupContentListener(panel);
+        this.showInitialView();
+
+        return panel;
+    }
+
+    private void setupHeader(BorderPane panel) {
         HeaderController headerController = new HeaderController(onLogout);
         panel.setTop(headerController.getView());
+    }
 
+    private void setupNavigation(BorderPane panel) {
         panel.setLeft(this.navigationPanel());
+    }
 
+    private void setupContentListener(BorderPane panel) {
         model.centerContentProperty().addListener((obs, oldVal, newVal) -> {
             panel.setCenter(newVal);
         });
+    }
 
+    private void showInitialView() {
         showVehicleListAction.run();
-
-        return panel;
     }
 
     private Region navigationPanel() {
@@ -50,26 +63,50 @@ public class MainFrameViewBuilder implements Builder<Region> {
         navPanel.setPrefWidth(200);
         navPanel.getStyleClass().add("navigation-panel");
 
-        Button vehiclesBtn = this.navigationButton("Liste des véhicules");
-        vehiclesBtn.setOnAction(e -> showVehicleListAction.run());
-
-        Button reservationsBtn = this.navigationButton("Mes réservations");
-        reservationsBtn.setOnAction(e -> showReservationsAction.run());
-
-        Button historyBtn = this.navigationButton("Historique");
-        historyBtn.setOnAction(e -> showHistoryAction.run());
-
-        Button adminBtn = this.navigationButton("Administration");
-        adminBtn.setOnAction(e -> showAdminPanelAction.run());
-
-        boolean isAdmin = SessionManager.getInstance().getCurrentAgent() != null &&
-                         SessionManager.getInstance().getCurrentAgent().isAdmin();
-        adminBtn.setVisible(isAdmin);
-        adminBtn.setManaged(isAdmin);
+        Button vehiclesBtn = this.createVehiclesButton();
+        Button reservationsBtn = this.createReservationsButton();
+        Button historyBtn = this.createHistoryButton();
+        Button adminBtn = this.createAdminButton();
 
         navPanel.getChildren().addAll(vehiclesBtn, reservationsBtn, historyBtn, adminBtn);
 
         return navPanel;
+    }
+
+    private Button createVehiclesButton() {
+        Button vehiclesBtn = this.navigationButton("Liste des véhicules");
+        vehiclesBtn.setOnAction(e -> showVehicleListAction.run());
+        return vehiclesBtn;
+    }
+
+    private Button createReservationsButton() {
+        Button reservationsBtn = this.navigationButton("Mes réservations");
+        reservationsBtn.setOnAction(e -> showReservationsAction.run());
+        return reservationsBtn;
+    }
+
+    private Button createHistoryButton() {
+        Button historyBtn = this.navigationButton("Historique");
+        historyBtn.setOnAction(e -> showHistoryAction.run());
+        return historyBtn;
+    }
+
+    private Button createAdminButton() {
+        Button adminBtn = this.navigationButton("Administration");
+        adminBtn.setOnAction(e -> showAdminPanelAction.run());
+        this.configureAdminButtonVisibility(adminBtn);
+        return adminBtn;
+    }
+
+    private void configureAdminButtonVisibility(Button adminBtn) {
+        boolean isAdmin = this.isCurrentUserAdmin();
+        adminBtn.setVisible(isAdmin);
+        adminBtn.setManaged(isAdmin);
+    }
+
+    private boolean isCurrentUserAdmin() {
+        return SessionManager.getInstance().getCurrentAgent() != null &&
+               SessionManager.getInstance().getCurrentAgent().isAdmin();
     }
 
     private Button navigationButton(String title) {
