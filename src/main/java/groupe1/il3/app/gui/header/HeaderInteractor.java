@@ -71,10 +71,6 @@ public class HeaderInteractor {
         }
     }
 
-    public void setErrorMessage(String message) {
-        model.setErrorMessage(message);
-    }
-
     public void handleUpdateError(Throwable exception) {
         model.setErrorMessage("Erreur lors de la mise à jour: " +
             (exception != null ? exception.getMessage() : "Erreur inconnue"));
