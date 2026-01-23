@@ -6,10 +6,10 @@ import java.util.List;
 import java.util.UUID;
 
 public interface VehicleDao {
-    public VehicleDto getVehicleById(UUID uuid);
-    public List<VehicleDto> getAllVehicles();
-    public void updateVehicleStatus(UUID vehicleUuid, String status);
-    public void createVehicle(VehicleDto vehicleDto);
-    public void updateVehicle(VehicleDto vehicleDto);
-    public void deleteVehicle(UUID vehicleUuid);
+    VehicleDto getVehicleById(UUID uuid);
+    List<VehicleDto> getAllVehicles();
+    void updateVehicleStatus(UUID vehicleUuid, String status);
+    void createVehicle(VehicleDto vehicleDto);
+    void updateVehicle(VehicleDto vehicleDto);
+    void deleteVehicle(UUID vehicleUuid);
 }
