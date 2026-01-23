@@ -16,27 +16,14 @@ public class HeaderModel {
     private final StringProperty errorMessage = new SimpleStringProperty("");
     private final StringProperty successMessage = new SimpleStringProperty("");
 
-    private final BooleanProperty editDialogVisible = new SimpleBooleanProperty(false);
     private final BooleanProperty updateInProgress = new SimpleBooleanProperty(false);
 
     public StringProperty appNameProperty() {
         return appName;
     }
 
-    public String getAppName() {
-        return appName.get();
-    }
-
-    public void setAppName(String appName) {
-        this.appName.set(appName);
-    }
-
     public StringProperty userFirstnameProperty() {
         return userFirstname;
-    }
-
-    public String getUserFirstname() {
-        return userFirstname.get();
     }
 
     public void setUserFirstname(String firstname) {
@@ -45,10 +32,6 @@ public class HeaderModel {
 
     public StringProperty userLastnameProperty() {
         return userLastname;
-    }
-
-    public String getUserLastname() {
-        return userLastname.get();
     }
 
     public void setUserLastname(String lastname) {
@@ -75,10 +58,6 @@ public class HeaderModel {
         return editPassword.get();
     }
 
-    public void setEditPassword(String password) {
-        this.editPassword.set(password);
-    }
-
     public StringProperty editPasswordConfirmProperty() {
         return editPasswordConfirm;
     }
@@ -87,16 +66,8 @@ public class HeaderModel {
         return editPasswordConfirm.get();
     }
 
-    public void setEditPasswordConfirm(String passwordConfirm) {
-        this.editPasswordConfirm.set(passwordConfirm);
-    }
-
     public StringProperty errorMessageProperty() {
         return errorMessage;
-    }
-
-    public String getErrorMessage() {
-        return errorMessage.get();
     }
 
     public void setErrorMessage(String message) {
@@ -107,32 +78,8 @@ public class HeaderModel {
         return successMessage;
     }
 
-    public String getSuccessMessage() {
-        return successMessage.get();
-    }
-
-    public void setSuccessMessage(String message) {
-        this.successMessage.set(message);
-    }
-
-    public BooleanProperty editDialogVisibleProperty() {
-        return editDialogVisible;
-    }
-
-    public boolean isEditDialogVisible() {
-        return editDialogVisible.get();
-    }
-
-    public void setEditDialogVisible(boolean visible) {
-        this.editDialogVisible.set(visible);
-    }
-
     public BooleanProperty updateInProgressProperty() {
         return updateInProgress;
-    }
-
-    public boolean isUpdateInProgress() {
-        return updateInProgress.get();
     }
 
     public void setUpdateInProgress(boolean inProgress) {
