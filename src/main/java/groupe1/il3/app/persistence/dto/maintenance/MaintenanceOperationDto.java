@@ -25,7 +25,6 @@ public record MaintenanceOperationDto(
         );
     }
 
-    //TODO: vehicleUuid will change to Vehicle object, so update this method accordingly
     public MaintenanceOperation toDomainObject() {
         return new MaintenanceOperation(
                 uuid,

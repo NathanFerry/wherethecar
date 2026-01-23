@@ -11,7 +11,6 @@ public class DatabaseConnectionManager {
     private final Object configLock = new Object();
 
     private DatabaseConnectionManager() {
-        // Required for the JPackage installer to work properly
         try {
             Class.forName("org.postgresql.Driver");
         } catch (ClassNotFoundException e) {
@@ -37,7 +36,7 @@ public class DatabaseConnectionManager {
     }
 
     public DatabaseConfig getConfig() {
-        return config; // volatile read is atomic
+        return config;
     }
 
     public Connection getNewConnection() throws DatabaseException {

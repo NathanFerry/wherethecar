@@ -5,10 +5,6 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
-/**
- * Model for the login view.
- * Holds the state of the login form including credentials and UI state.
- */
 public class LoginModel {
 
     private final StringProperty email = new SimpleStringProperty("");
@@ -16,7 +12,6 @@ public class LoginModel {
     private final StringProperty errorMessage = new SimpleStringProperty("");
     private final BooleanProperty loginInProgress = new SimpleBooleanProperty(false);
 
-    // Email property
     public StringProperty emailProperty() {
         return email;
     }
@@ -29,7 +24,6 @@ public class LoginModel {
         this.email.set(email);
     }
 
-    // Password property
     public StringProperty passwordProperty() {
         return password;
     }
@@ -42,7 +36,6 @@ public class LoginModel {
         this.password.set(password);
     }
 
-    // Error message property
     public StringProperty errorMessageProperty() {
         return errorMessage;
     }
@@ -55,7 +48,6 @@ public class LoginModel {
         this.errorMessage.set(errorMessage);
     }
 
-    // Login in progress property
     public BooleanProperty loginInProgressProperty() {
         return loginInProgress;
     }
