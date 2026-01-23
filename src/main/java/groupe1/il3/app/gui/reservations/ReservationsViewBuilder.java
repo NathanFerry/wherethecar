@@ -171,7 +171,7 @@ public class ReservationsViewBuilder implements Builder<Region> {
         return row;
     }
 
-    private int populateAgentSection(GridPane detailsGrid, Reservation reservation, int row) {
+    private void populateAgentSection(GridPane detailsGrid, Reservation reservation, int row) {
         addSectionHeader(detailsGrid, row++, "Agent");
 
         if (reservation.agent() != null) {
@@ -183,7 +183,6 @@ public class ReservationsViewBuilder implements Builder<Region> {
             addDetailRow(detailsGrid, row++, "Agent:", "Non disponible");
         }
 
-        return row;
     }
 
     private VBox createPendingNoticeBox() {

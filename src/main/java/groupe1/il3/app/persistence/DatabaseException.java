@@ -1,8 +1,5 @@
 package groupe1.il3.app.persistence;
 
-/**
- * Custom exception for database-related errors.
- */
 public class DatabaseException extends Exception {
 
     public DatabaseException(String message) {
