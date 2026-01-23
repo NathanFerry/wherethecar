@@ -2,7 +2,6 @@ package groupe1.il3.app.gui.header;
 
 import groupe1.il3.app.domain.agent.Agent;
 import groupe1.il3.app.domain.authentication.SessionManager;
-import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
@@ -11,16 +10,14 @@ import javafx.util.Builder;
 
 public class HeaderController {
 
-    private final HeaderModel model;
     private final HeaderInteractor interactor;
     private final Builder<Region> viewBuilder;
     private final Runnable onLogout;
-    private Dialog<ButtonType> currentDialog;
 
     public HeaderController(Runnable onLogout) {
-        this.model = new HeaderModel();
-        this.interactor = new HeaderInteractor();
         this.onLogout = onLogout;
+        HeaderModel model = new HeaderModel();
+        this.interactor = new HeaderInteractor(model);
         this.viewBuilder = new HeaderViewBuilder(model, this::showEditDialog, this::handleLogout);
 
         initializeUserInfo();
@@ -32,10 +29,7 @@ public class HeaderController {
 
     private void initializeUserInfo() {
         Agent currentAgent = SessionManager.getInstance().getCurrentAgent();
-        if (currentAgent != null) {
-            model.setUserFirstname(currentAgent.firstname());
-            model.setUserLastname(currentAgent.lastname());
-        }
+        interactor.initializeUserInfo(currentAgent);
     }
 
     private void showEditDialog() {
@@ -44,63 +38,41 @@ public class HeaderController {
             return;
         }
 
-        model.clearMessages();
-        model.clearEditFields();
-        model.setEditEmail(currentAgent.email());
+        interactor.prepareEditDialog(currentAgent);
 
         HeaderViewBuilder headerViewBuilder = (HeaderViewBuilder) viewBuilder;
-        currentDialog = headerViewBuilder.buildEditDialog();
+        Dialog<ButtonType>[] dialogHolder = new Dialog[1];
+        dialogHolder[0] = headerViewBuilder.buildEditDialog(() -> handleUpdate(currentAgent, dialogHolder[0]));
 
-        currentDialog.setResultConverter(buttonType -> {
-            if (buttonType.getButtonData() == ButtonType.OK.getButtonData()) {
-                handleUpdate(currentAgent);
-                return null;
-            }
-            return buttonType;
-        });
-
-        currentDialog.showAndWait();
+        dialogHolder[0].showAndWait();
     }
 
-    private void handleUpdate(Agent currentAgent) {
-        model.clearMessages();
+    private void handleUpdate(Agent currentAgent, Dialog<ButtonType> dialog) {
+        String email = interactor.getEditEmail();
+        String password = interactor.getEditPassword();
+        String passwordConfirm = interactor.getEditPasswordConfirm();
 
-        String email = model.getEditEmail();
-        String password = model.getEditPassword();
-        String passwordConfirm = model.getEditPasswordConfirm();
-
-        if (email.trim().isEmpty() && password.trim().isEmpty()) {
-            model.setErrorMessage("Veuillez remplir au moins un champ.");
-            Platform.runLater(this::showEditDialog);
+        if (!interactor.validateUpdate(email, password, passwordConfirm)) {
             return;
         }
 
-        if (!password.isEmpty() && !password.equals(passwordConfirm)) {
-            model.setErrorMessage("Les mots de passe ne correspondent pas.");
-            Platform.runLater(this::showEditDialog);
-            return;
-        }
-
-        model.setUpdateInProgress(true);
-
-        String newEmail = email.trim().isEmpty() ? null : email.trim();
-        String newPassword = password.trim().isEmpty() ? null : password.trim();
-
-        Task<Agent> updateTask = interactor.createUpdateUserTask(currentAgent, newEmail, newPassword);
+        Task<Agent> updateTask = new Task<>() {
+            @Override
+            protected Agent call() {
+                return interactor.updateUser(currentAgent, email, password);
+            }
+        };
 
         updateTask.setOnSucceeded(event -> {
-            model.setUpdateInProgress(false);
             Agent updatedAgent = updateTask.getValue();
             SessionManager.getInstance().setCurrentAgent(updatedAgent);
-            initializeUserInfo();
+            interactor.initializeUserInfo(updatedAgent);
+            dialog.close();
         });
 
         updateTask.setOnFailed(event -> {
-            model.setUpdateInProgress(false);
             Throwable exception = updateTask.getException();
-            model.setErrorMessage("Erreur lors de la mise à jour: " +
-                (exception != null ? exception.getMessage() : "Erreur inconnue"));
-            Platform.runLater(this::showEditDialog);
+            interactor.handleUpdateError(exception);
         });
 
         new Thread(updateTask).start();

@@ -11,7 +11,6 @@ import java.util.function.BiConsumer;
 
 public class MaintenanceManagementController {
 
-    private final MaintenanceManagementModel model;
     private final MaintenanceManagementInteractor interactor;
     private final Builder<Region> viewBuilder;
     private final BiConsumer<String, String> messageHandler;
@@ -21,8 +20,8 @@ public class MaintenanceManagementController {
         UUID vehicleUuid,
         BiConsumer<String, String> messageHandler
     ) {
-        this.model = new MaintenanceManagementModel();
-        this.interactor = new MaintenanceManagementInteractor();
+        MaintenanceManagementModel model = new MaintenanceManagementModel();
+        this.interactor = new MaintenanceManagementInteractor(model);
         this.messageHandler = messageHandler;
         this.currentVehicleUuid = vehicleUuid;
         this.viewBuilder = new MaintenanceManagementViewBuilder(
@@ -46,11 +45,15 @@ public class MaintenanceManagementController {
 
         messageHandler.accept("", "");
 
-        Task<List<MaintenanceOperation>> task = interactor.createLoadMaintenanceOperationsTask(currentVehicleUuid);
+        Task<List<MaintenanceOperation>> task = new Task<>() {
+            @Override
+            protected List<MaintenanceOperation> call() {
+                return interactor.fetchMaintenanceOperations(currentVehicleUuid);
+            }
+        };
 
         task.setOnSucceeded(event -> {
-            model.maintenanceOperationsProperty().clear();
-            model.maintenanceOperationsProperty().addAll(task.getValue());
+            interactor.updateMaintenanceOperationsList(task.getValue());
         });
 
         task.setOnFailed(event -> {
@@ -64,7 +67,13 @@ public class MaintenanceManagementController {
     private void addMaintenanceOperation(MaintenanceOperation operation) {
         messageHandler.accept("", "");
 
-        Task<Void> task = interactor.createMaintenanceOperationTask(operation);
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() {
+                interactor.createMaintenanceOperation(operation);
+                return null;
+            }
+        };
 
         task.setOnSucceeded(event -> {
             messageHandler.accept("", "Opération de maintenance ajoutée avec succès");
@@ -82,7 +91,13 @@ public class MaintenanceManagementController {
     private void editMaintenanceOperation(MaintenanceOperation operation) {
         messageHandler.accept("", "");
 
-        Task<Void> task = interactor.updateMaintenanceOperationTask(operation);
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() {
+                interactor.updateMaintenanceOperation(operation);
+                return null;
+            }
+        };
 
         task.setOnSucceeded(event -> {
             messageHandler.accept("", "Opération de maintenance modifiée avec succès");
@@ -100,7 +115,13 @@ public class MaintenanceManagementController {
     private void deleteMaintenanceOperation(UUID operationUuid) {
         messageHandler.accept("", "");
 
-        Task<Void> task = interactor.deleteMaintenanceOperationTask(operationUuid);
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() {
+                interactor.deleteMaintenanceOperation(operationUuid);
+                return null;
+            }
+        };
 
         task.setOnSucceeded(event -> {
             messageHandler.accept("", "Opération de maintenance supprimée avec succès");

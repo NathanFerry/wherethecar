@@ -2,56 +2,39 @@ package groupe1.il3.app.gui.admin.vehiclemanagement;
 
 import groupe1.il3.app.domain.vehicle.Vehicle;
 import groupe1.il3.app.persistence.broker.vehicle.VehicleBroker;
-import javafx.concurrent.Task;
 
 import java.util.List;
 import java.util.UUID;
 
 public class VehicleManagementInteractor {
 
+    private final VehicleManagementModel model;
     private final VehicleBroker vehicleBroker;
 
-    public VehicleManagementInteractor() {
+    public VehicleManagementInteractor(VehicleManagementModel model) {
+        this.model = model;
         this.vehicleBroker = new VehicleBroker();
     }
 
-    public Task<List<Vehicle>> createLoadVehiclesTask() {
-        return new Task<>() {
-            @Override
-            protected List<Vehicle> call() {
-                return vehicleBroker.getAllVehicles();
-            }
-        };
+    public List<Vehicle> fetchAllVehicles() {
+        return vehicleBroker.getAllVehicles();
     }
 
-    public Task<Void> createVehicleTask(Vehicle vehicle) {
-        return new Task<>() {
-            @Override
-            protected Void call() {
-                vehicleBroker.createVehicle(vehicle);
-                return null;
-            }
-        };
+    public void createVehicle(Vehicle vehicle) {
+        vehicleBroker.createVehicle(vehicle);
     }
 
-    public Task<Void> updateVehicleTask(Vehicle vehicle) {
-        return new Task<>() {
-            @Override
-            protected Void call() {
-                vehicleBroker.updateVehicle(vehicle);
-                return null;
-            }
-        };
+    public void updateVehicle(Vehicle vehicle) {
+        vehicleBroker.updateVehicle(vehicle);
     }
 
-    public Task<Void> deleteVehicleTask(UUID vehicleUuid) {
-        return new Task<>() {
-            @Override
-            protected Void call() {
-                vehicleBroker.deleteVehicle(vehicleUuid);
-                return null;
-            }
-        };
+    public void deleteVehicle(UUID vehicleUuid) {
+        vehicleBroker.deleteVehicle(vehicleUuid);
+    }
+
+    public void updateVehiclesList(List<Vehicle> vehicles) {
+        model.vehiclesProperty().clear();
+        model.vehiclesProperty().addAll(vehicles);
     }
 }
 

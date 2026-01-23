@@ -167,7 +167,6 @@ public class VehicleManagementViewBuilder implements Builder<Region> {
                     newVal.acquisitionDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) : "N/A");
                 addDetailRow(detailsGrid, 12, "Statut:", formatStatus(newVal.status()));
 
-                // Initialize maintenance controller for the selected vehicle
                 maintenanceController = new MaintenanceManagementController(
                     newVal.uuid(),
                     messageHandler

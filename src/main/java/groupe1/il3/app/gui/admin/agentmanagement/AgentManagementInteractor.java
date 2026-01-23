@@ -2,56 +2,39 @@ package groupe1.il3.app.gui.admin.agentmanagement;
 
 import groupe1.il3.app.domain.agent.Agent;
 import groupe1.il3.app.persistence.broker.agent.AgentBroker;
-import javafx.concurrent.Task;
 
 import java.util.List;
 import java.util.UUID;
 
 public class AgentManagementInteractor {
 
+    private final AgentManagementModel model;
     private final AgentBroker agentBroker;
 
-    public AgentManagementInteractor() {
+    public AgentManagementInteractor(AgentManagementModel model) {
+        this.model = model;
         this.agentBroker = new AgentBroker();
     }
 
-    public Task<List<Agent>> createLoadAgentsTask() {
-        return new Task<>() {
-            @Override
-            protected List<Agent> call() {
-                return agentBroker.getAllAgents();
-            }
-        };
+    public List<Agent> fetchAllAgents() {
+        return agentBroker.getAllAgents();
     }
 
-    public Task<Void> createAgentTask(Agent agent) {
-        return new Task<>() {
-            @Override
-            protected Void call() {
-                agentBroker.createAgent(agent);
-                return null;
-            }
-        };
+    public void createAgent(Agent agent) {
+        agentBroker.createAgent(agent);
     }
 
-    public Task<Void> updateAgentTask(Agent agent) {
-        return new Task<>() {
-            @Override
-            protected Void call() {
-                agentBroker.updateAgent(agent);
-                return null;
-            }
-        };
+    public void updateAgent(Agent agent) {
+        agentBroker.updateAgent(agent);
     }
 
-    public Task<Void> deleteAgentTask(UUID agentUuid) {
-        return new Task<>() {
-            @Override
-            protected Void call() {
-                agentBroker.deleteAgent(agentUuid);
-                return null;
-            }
-        };
+    public void deleteAgent(UUID agentUuid) {
+        agentBroker.deleteAgent(agentUuid);
+    }
+
+    public void updateAgentsList(List<Agent> agents) {
+        model.agentsProperty().clear();
+        model.agentsProperty().addAll(agents);
     }
 }
 

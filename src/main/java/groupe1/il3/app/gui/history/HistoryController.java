@@ -10,13 +10,12 @@ import javafx.util.Builder;
 import java.util.List;
 
 public class HistoryController {
-    private final HistoryModel model;
     private final HistoryInteractor interactor;
     private final Builder<Region> viewBuilder;
 
     public HistoryController() {
-        this.model = new HistoryModel();
-        this.interactor = new HistoryInteractor();
+        HistoryModel model = new HistoryModel();
+        this.interactor = new HistoryInteractor(model);
         this.viewBuilder = new HistoryViewBuilder(model, this::loadHistory);
     }
 
@@ -32,17 +31,18 @@ public class HistoryController {
             return;
         }
 
-        model.setLoading(true);
-        Task<List<Reservation>> task = interactor.createLoadHistoryTask(currentAgent.uuid());
+        Task<List<Reservation>> task = new Task<>() {
+            @Override
+            protected List<Reservation> call() {
+                return interactor.loadHistory(currentAgent.uuid());
+            }
+        };
 
         task.setOnSucceeded(event -> {
-            model.setLoading(false);
-            model.reservationsProperty().clear();
-            model.reservationsProperty().addAll(task.getValue());
+            interactor.updateModelWithReservations(task.getValue());
         });
 
         task.setOnFailed(event -> {
-            model.setLoading(false);
             System.err.println("Failed to load history: " + task.getException().getMessage());
             task.getException().printStackTrace();
         });

@@ -11,14 +11,13 @@ import java.util.function.BiConsumer;
 
 public class VehicleManagementController {
 
-    private final VehicleManagementModel model;
     private final VehicleManagementInteractor interactor;
     private final Builder<Region> viewBuilder;
     private final BiConsumer<String, String> messageHandler;
 
     public VehicleManagementController(BiConsumer<String, String> messageHandler) {
-        this.model = new VehicleManagementModel();
-        this.interactor = new VehicleManagementInteractor();
+        VehicleManagementModel model = new VehicleManagementModel();
+        this.interactor = new VehicleManagementInteractor(model);
         this.messageHandler = messageHandler;
         this.viewBuilder = new VehicleManagementViewBuilder(
             model,
@@ -37,11 +36,15 @@ public class VehicleManagementController {
     public void loadVehicles() {
         messageHandler.accept("", "");
 
-        Task<List<Vehicle>> task = interactor.createLoadVehiclesTask();
+        Task<List<Vehicle>> task = new Task<>() {
+            @Override
+            protected List<Vehicle> call() {
+                return interactor.fetchAllVehicles();
+            }
+        };
 
         task.setOnSucceeded(event -> {
-            model.vehiclesProperty().clear();
-            model.vehiclesProperty().addAll(task.getValue());
+            interactor.updateVehiclesList(task.getValue());
         });
 
         task.setOnFailed(event -> {
@@ -55,7 +58,13 @@ public class VehicleManagementController {
     private void addVehicle(Vehicle vehicle) {
         messageHandler.accept("", "");
 
-        Task<Void> task = interactor.createVehicleTask(vehicle);
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() {
+                interactor.createVehicle(vehicle);
+                return null;
+            }
+        };
 
         task.setOnSucceeded(event -> {
             messageHandler.accept("", "Véhicule ajouté avec succès");
@@ -73,7 +82,13 @@ public class VehicleManagementController {
     private void editVehicle(Vehicle vehicle) {
         messageHandler.accept("", "");
 
-        Task<Void> task = interactor.updateVehicleTask(vehicle);
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() {
+                interactor.updateVehicle(vehicle);
+                return null;
+            }
+        };
 
         task.setOnSucceeded(event -> {
             messageHandler.accept("", "Véhicule modifié avec succès");
@@ -91,7 +106,13 @@ public class VehicleManagementController {
     private void deleteVehicle(UUID vehicleUuid) {
         messageHandler.accept("", "");
 
-        Task<Void> task = interactor.deleteVehicleTask(vehicleUuid);
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() {
+                interactor.deleteVehicle(vehicleUuid);
+                return null;
+            }
+        };
 
         task.setOnSucceeded(event -> {
             messageHandler.accept("", "Véhicule supprimé avec succès");

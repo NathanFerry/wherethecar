@@ -89,17 +89,33 @@ public class ReservationsViewBuilder implements Builder<Region> {
         VBox detailsBox = new VBox(15);
         detailsBox.setAlignment(Pos.TOP_LEFT);
 
+        Label titleLabel = createDetailsTitleLabel();
+        GridPane detailsGrid = createDetailsGrid();
+        VBox pendingNoticeBox = createPendingNoticeBox();
+        VBox returnVehicleBox = createReturnVehicleBox();
+
+        setupDetailsBoxListener(titleLabel, detailsGrid, pendingNoticeBox);
+
+        detailsBox.getChildren().addAll(titleLabel, new Separator(), pendingNoticeBox, detailsGrid, new Separator(), returnVehicleBox);
+
+        return detailsBox;
+    }
+
+    private Label createDetailsTitleLabel() {
         Label titleLabel = new Label();
         titleLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
+        return titleLabel;
+    }
 
+    private GridPane createDetailsGrid() {
         GridPane detailsGrid = new GridPane();
         detailsGrid.setHgap(15);
         detailsGrid.setVgap(10);
         detailsGrid.setPadding(new Insets(10));
+        return detailsGrid;
+    }
 
-        VBox pendingNoticeBox = createPendingNoticeBox();
-        VBox returnVehicleBox = createReturnVehicleBox();
-
+    private void setupDetailsBoxListener(Label titleLabel, GridPane detailsGrid, VBox pendingNoticeBox) {
         model.selectedReservationProperty().addListener((obs, oldVal, newVal) -> {
             detailsGrid.getChildren().clear();
             pendingNoticeBox.setVisible(false);
@@ -111,48 +127,62 @@ public class ReservationsViewBuilder implements Builder<Region> {
                     pendingNoticeBox.setVisible(true);
                 }
 
-                int row = 0;
-
-                addSectionHeader(detailsGrid, row++, "Période de réservation");
-                addDetailRow(detailsGrid, row++, "Statut:", formatReservationStatus(newVal.status()));
-                addDetailRow(detailsGrid, row++, "Date de début:",
-                    formatDateTime(newVal.startDate()));
-                addDetailRow(detailsGrid, row++, "Date de fin:",
-                    formatDateTime(newVal.endDate()));
-
-                row++;
-                addSectionHeader(detailsGrid, row++, "Véhicule");
-                if (newVal.vehicle() != null) {
-                    addDetailRow(detailsGrid, row++, "Modèle:",
-                        newVal.vehicle().manufacturer() + " " + newVal.vehicle().model());
-                    addDetailRow(detailsGrid, row++, "Plaque:",
-                        newVal.vehicle().licencePlate());
-                    addDetailRow(detailsGrid, row++, "Énergie:",
-                        formatEnergy(newVal.vehicle().energy().toString()));
-                    addDetailRow(detailsGrid, row++, "Sièges:",
-                        String.valueOf(newVal.vehicle().seats()));
-                    addDetailRow(detailsGrid, row++, "Couleur:",
-                        newVal.vehicle().color());
-                } else {
-                    addDetailRow(detailsGrid, row++, "Véhicule:", "Non disponible");
-                }
-
-                row++;
-                addSectionHeader(detailsGrid, row++, "Agent");
-                if (newVal.agent() != null) {
-                    addDetailRow(detailsGrid, row++, "Nom:",
-                        newVal.agent().firstname() + " " + newVal.agent().lastname());
-                    addDetailRow(detailsGrid, row++, "Email:",
-                        newVal.agent().email());
-                } else {
-                    addDetailRow(detailsGrid, row++, "Agent:", "Non disponible");
-                }
+                populateReservationDetails(detailsGrid, newVal);
             }
         });
+    }
 
-        detailsBox.getChildren().addAll(titleLabel, new Separator(), pendingNoticeBox, detailsGrid, new Separator(), returnVehicleBox);
+    private void populateReservationDetails(GridPane detailsGrid, Reservation reservation) {
+        int row = 0;
 
-        return detailsBox;
+        row = populateReservationPeriodSection(detailsGrid, reservation, row);
+        row++;
+        row = populateVehicleSection(detailsGrid, reservation, row);
+        row++;
+        populateAgentSection(detailsGrid, reservation, row);
+    }
+
+    private int populateReservationPeriodSection(GridPane detailsGrid, Reservation reservation, int row) {
+        addSectionHeader(detailsGrid, row++, "Période de réservation");
+        addDetailRow(detailsGrid, row++, "Statut:", formatReservationStatus(reservation.status()));
+        addDetailRow(detailsGrid, row++, "Date de début:", formatDateTime(reservation.startDate()));
+        addDetailRow(detailsGrid, row++, "Date de fin:", formatDateTime(reservation.endDate()));
+        return row;
+    }
+
+    private int populateVehicleSection(GridPane detailsGrid, Reservation reservation, int row) {
+        addSectionHeader(detailsGrid, row++, "Véhicule");
+
+        if (reservation.vehicle() != null) {
+            addDetailRow(detailsGrid, row++, "Modèle:",
+                reservation.vehicle().manufacturer() + " " + reservation.vehicle().model());
+            addDetailRow(detailsGrid, row++, "Plaque:",
+                reservation.vehicle().licencePlate());
+            addDetailRow(detailsGrid, row++, "Énergie:",
+                formatEnergy(reservation.vehicle().energy().toString()));
+            addDetailRow(detailsGrid, row++, "Sièges:",
+                String.valueOf(reservation.vehicle().seats()));
+            addDetailRow(detailsGrid, row++, "Couleur:",
+                reservation.vehicle().color());
+        } else {
+            addDetailRow(detailsGrid, row++, "Véhicule:", "Non disponible");
+        }
+
+        return row;
+    }
+
+    private void populateAgentSection(GridPane detailsGrid, Reservation reservation, int row) {
+        addSectionHeader(detailsGrid, row++, "Agent");
+
+        if (reservation.agent() != null) {
+            addDetailRow(detailsGrid, row++, "Nom:",
+                reservation.agent().firstname() + " " + reservation.agent().lastname());
+            addDetailRow(detailsGrid, row++, "Email:",
+                reservation.agent().email());
+        } else {
+            addDetailRow(detailsGrid, row++, "Agent:", "Non disponible");
+        }
+
     }
 
     private VBox createPendingNoticeBox() {
@@ -183,13 +213,24 @@ public class ReservationsViewBuilder implements Builder<Region> {
         Label sectionTitle = new Label("Retour du véhicule");
         sectionTitle.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
 
-        HBox kilometersBox = new HBox(10);
-        kilometersBox.setAlignment(Pos.CENTER_LEFT);
-
         Label currentKilometersLabel = new Label();
         currentKilometersLabel.setStyle("-fx-font-weight: bold;");
 
-        Label newKilometersLabel = new Label("Nouveau kilométrage:");
+        TextField newKilometersField = createKilometersInputField();
+        HBox kilometersBox = createKilometersInputBox(currentKilometersLabel, newKilometersField);
+
+        Button returnButton = createReturnButton();
+        Label errorLabel = createErrorLabel();
+
+        setupReturnBoxListener(returnBox, currentKilometersLabel, newKilometersField);
+
+        returnBox.getChildren().addAll(sectionTitle, kilometersBox, returnButton, errorLabel);
+        returnBox.setVisible(false);
+
+        return returnBox;
+    }
+
+    private TextField createKilometersInputField() {
         TextField newKilometersField = new TextField();
         newKilometersField.setPromptText("Entrez le nouveau kilométrage");
         newKilometersField.setPrefWidth(200);
@@ -201,43 +242,69 @@ public class ReservationsViewBuilder implements Builder<Region> {
                 try {
                     model.setNewKilometers(Integer.parseInt(newVal));
                 } catch (NumberFormatException e) {
-                    // Ignore invalid input
                 }
             }
         });
 
+        return newKilometersField;
+    }
+
+    private HBox createKilometersInputBox(Label currentKilometersLabel, TextField newKilometersField) {
+        HBox kilometersBox = new HBox(10);
+        kilometersBox.setAlignment(Pos.CENTER_LEFT);
+
+        Label newKilometersLabel = new Label("Nouveau kilométrage:");
+
         kilometersBox.getChildren().addAll(currentKilometersLabel, newKilometersLabel, newKilometersField);
 
+        return kilometersBox;
+    }
+
+    private Button createReturnButton() {
         Button returnButton = new Button("Retourner le véhicule");
         returnButton.getStyleClass().add("return-button");
-        returnButton.setOnAction(e -> {
-            Alert confirmDialog = new Alert(Alert.AlertType.CONFIRMATION);
-            StyleApplier.applyStylesheets(confirmDialog);
-            confirmDialog.setTitle("Confirmer le retour");
-            confirmDialog.setHeaderText("Retour du véhicule");
-            confirmDialog.setContentText("Êtes-vous sûr de vouloir retourner ce véhicule ?");
+        returnButton.setOnAction(e -> handleReturnVehicleAction());
 
-            confirmDialog.showAndWait().ifPresent(response -> {
-                if (response == ButtonType.OK) {
-                    returnVehicleAction.run();
+        return returnButton;
+    }
 
-                    if (model.getReturnErrorMessage().isEmpty()) {
-                        Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
-                        StyleApplier.applyStylesheets(successAlert);
-                        successAlert.setTitle("Retour confirmé");
-                        successAlert.setHeaderText("Véhicule retourné avec succès");
-                        successAlert.setContentText("Le véhicule a été retourné et le kilométrage a été mis à jour.");
-                        successAlert.showAndWait();
-                    }
+    private void handleReturnVehicleAction() {
+        Alert confirmDialog = new Alert(Alert.AlertType.CONFIRMATION);
+        StyleApplier.applyStylesheets(confirmDialog);
+        confirmDialog.setTitle("Confirmer le retour");
+        confirmDialog.setHeaderText("Retour du véhicule");
+        confirmDialog.setContentText("Êtes-vous sûr de vouloir retourner ce véhicule ?");
+
+        confirmDialog.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                returnVehicleAction.run();
+
+                if (model.getReturnErrorMessage().isEmpty()) {
+                    showReturnSuccessDialog();
                 }
-            });
+            }
         });
+    }
 
+    private void showReturnSuccessDialog() {
+        Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
+        StyleApplier.applyStylesheets(successAlert);
+        successAlert.setTitle("Retour confirmé");
+        successAlert.setHeaderText("Véhicule retourné avec succès");
+        successAlert.setContentText("Le véhicule a été retourné et le kilométrage a été mis à jour.");
+        successAlert.showAndWait();
+    }
+
+    private Label createErrorLabel() {
         Label errorLabel = new Label();
         errorLabel.setStyle("-fx-text-fill: red;");
         errorLabel.textProperty().bind(model.returnErrorMessageProperty());
         errorLabel.visibleProperty().bind(model.returnErrorMessageProperty().isNotEmpty());
 
+        return errorLabel;
+    }
+
+    private void setupReturnBoxListener(VBox returnBox, Label currentKilometersLabel, TextField newKilometersField) {
         model.selectedReservationProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null && newVal.vehicle() != null && newVal.status() == ReservationStatus.CONFIRMED) {
                 int currentKm = newVal.vehicle().kilometers();
@@ -249,11 +316,6 @@ public class ReservationsViewBuilder implements Builder<Region> {
             }
             model.setReturnErrorMessage("");
         });
-
-        returnBox.getChildren().addAll(sectionTitle, kilometersBox, returnButton, errorLabel);
-        returnBox.setVisible(false);
-
-        return returnBox;
     }
 
     private void addSectionHeader(GridPane grid, int row, String title) {

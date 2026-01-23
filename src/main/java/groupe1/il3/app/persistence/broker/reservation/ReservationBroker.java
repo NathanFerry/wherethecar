@@ -98,8 +98,6 @@ public class ReservationBroker {
 
     public void approveReservation(UUID reservationUuid, UUID vehicleUuid) {
         reservationDao.updateReservationStatus(reservationUuid, "confirmed");
-        // Note: We no longer set the vehicle status to RESERVED since we support multiple
-        // non-overlapping reservations for the same vehicle
     }
 
     public void cancelReservation(UUID reservationUuid) {

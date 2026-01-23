@@ -11,11 +11,9 @@ public class MainFrameController {
 
     private final Builder<Region> viewBuilder;
     private final MainFrameModel model;
-    private final Runnable onLogout;
 
     public MainFrameController(Runnable onLogout) {
         this.model = new MainFrameModel();
-        this.onLogout = onLogout;
         this.viewBuilder = new MainFrameViewBuilder(this.model, this::showVehicleList, this::showReservations, this::showHistory, this::showAdminPanel, onLogout);
     }
 

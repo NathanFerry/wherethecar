@@ -2,55 +2,38 @@ package groupe1.il3.app.gui.admin.maintenancemanagement;
 
 import groupe1.il3.app.domain.maintenance.MaintenanceOperation;
 import groupe1.il3.app.persistence.broker.maintenance.MaintenanceOperationBroker;
-import javafx.concurrent.Task;
 
 import java.util.List;
 import java.util.UUID;
 
 public class MaintenanceManagementInteractor {
 
+    private final MaintenanceManagementModel model;
     private final MaintenanceOperationBroker maintenanceOperationBroker;
 
-    public MaintenanceManagementInteractor() {
+    public MaintenanceManagementInteractor(MaintenanceManagementModel model) {
+        this.model = model;
         this.maintenanceOperationBroker = new MaintenanceOperationBroker();
     }
 
-    public Task<List<MaintenanceOperation>> createLoadMaintenanceOperationsTask(UUID vehicleUuid) {
-        return new Task<>() {
-            @Override
-            protected List<MaintenanceOperation> call() {
-                return maintenanceOperationBroker.getMaintenanceOperationsByVehicleUuid(vehicleUuid);
-            }
-        };
+    public List<MaintenanceOperation> fetchMaintenanceOperations(UUID vehicleUuid) {
+        return maintenanceOperationBroker.getMaintenanceOperationsByVehicleUuid(vehicleUuid);
     }
 
-    public Task<Void> createMaintenanceOperationTask(MaintenanceOperation maintenanceOperation) {
-        return new Task<>() {
-            @Override
-            protected Void call() {
-                maintenanceOperationBroker.createMaintenanceOperation(maintenanceOperation);
-                return null;
-            }
-        };
+    public void createMaintenanceOperation(MaintenanceOperation maintenanceOperation) {
+        maintenanceOperationBroker.createMaintenanceOperation(maintenanceOperation);
     }
 
-    public Task<Void> updateMaintenanceOperationTask(MaintenanceOperation maintenanceOperation) {
-        return new Task<>() {
-            @Override
-            protected Void call() {
-                maintenanceOperationBroker.updateMaintenanceOperation(maintenanceOperation);
-                return null;
-            }
-        };
+    public void updateMaintenanceOperation(MaintenanceOperation maintenanceOperation) {
+        maintenanceOperationBroker.updateMaintenanceOperation(maintenanceOperation);
     }
 
-    public Task<Void> deleteMaintenanceOperationTask(UUID operationUuid) {
-        return new Task<>() {
-            @Override
-            protected Void call() {
-                maintenanceOperationBroker.deleteMaintenanceOperation(operationUuid);
-                return null;
-            }
-        };
+    public void deleteMaintenanceOperation(UUID operationUuid) {
+        maintenanceOperationBroker.deleteMaintenanceOperation(operationUuid);
+    }
+
+    public void updateMaintenanceOperationsList(List<MaintenanceOperation> operations) {
+        model.maintenanceOperationsProperty().clear();
+        model.maintenanceOperationsProperty().addAll(operations);
     }
 }

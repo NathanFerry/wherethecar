@@ -72,14 +72,31 @@ public class VehicleSelectorViewBuilder implements Builder<Region> {
         listPane.setPrefWidth(350);
         listPane.getStyleClass().add("vehicle-list-container");
 
+        Label title = createVehicleListTitle();
+        TextField searchField = createSearchField();
+        ListView<Vehicle> vehicleListView = createVehicleListView();
+        Button refreshButton = createRefreshButton();
+
+        listPane.getChildren().addAll(title, searchField, vehicleListView, refreshButton);
+
+        return listPane;
+    }
+
+    private Label createVehicleListTitle() {
         Label title = new Label("Liste des Véhicules");
         title.getStyleClass().add("vehicle-list-title");
+        return title;
+    }
 
+    private TextField createSearchField() {
         TextField searchField = new TextField();
         searchField.setPromptText("Rechercher un véhicule...");
         searchField.textProperty().bindBidirectional(model.searchTextProperty());
         searchField.getStyleClass().add("vehicle-search-field");
+        return searchField;
+    }
 
+    private ListView<Vehicle> createVehicleListView() {
         ListView<Vehicle> vehicleListView = new ListView<>();
         vehicleListView.setItems(model.getFilteredVehicles());
         vehicleListView.setCellFactory(lv -> new VehicleListCell());
@@ -94,15 +111,15 @@ public class VehicleSelectorViewBuilder implements Builder<Region> {
         );
 
         VBox.setVgrow(vehicleListView, Priority.ALWAYS);
+        return vehicleListView;
+    }
 
+    private Button createRefreshButton() {
         Button refreshButton = new Button("Actualiser");
         refreshButton.setOnAction(e -> loadVehiclesAction.run());
         refreshButton.setMaxWidth(Double.MAX_VALUE);
         refreshButton.getStyleClass().add("vehicle-refresh-button");
-
-        listPane.getChildren().addAll(title, searchField, vehicleListView, refreshButton);
-
-        return listPane;
+        return refreshButton;
     }
 
     private Region createVehicleDetailsPane() {
@@ -141,38 +158,49 @@ public class VehicleSelectorViewBuilder implements Builder<Region> {
         detailsGrid.setVgap(10);
         detailsGrid.setPadding(new Insets(10));
 
-        Button reserveButton = new Button("Réserver ce véhicule");
-        reserveButton.setOnAction(e -> showReservationDialog());
-        reserveButton.setMaxWidth(Double.MAX_VALUE);
-        reserveButton.getStyleClass().add("vehicle-reserve-button");
+        Button reserveButton = createReserveButton();
 
-        reserveButton.disableProperty().bind(model.selectedVehicleProperty().isNull());
-
-        model.selectedVehicleProperty().addListener((obs, oldVal, newVal) -> {
-            detailsGrid.getChildren().clear();
-            if (newVal != null) {
-                titleLabel.setText(newVal.manufacturer() + " " + newVal.model());
-
-                addDetailRow(detailsGrid, 0, "Plaque d'immatriculation:", newVal.licencePlate());
-                addDetailRow(detailsGrid, 1, "Constructeur:", newVal.manufacturer());
-                addDetailRow(detailsGrid, 2, "Modèle:", newVal.model());
-                addDetailRow(detailsGrid, 3, "Énergie:", formatEnergy(newVal.energy().toString()));
-                addDetailRow(detailsGrid, 4, "Puissance:", newVal.power() + " CV");
-                addDetailRow(detailsGrid, 5, "Sièges:", String.valueOf(newVal.seats()));
-                addDetailRow(detailsGrid, 6, "Capacité:", newVal.capacity() + " L");
-                addDetailRow(detailsGrid, 7, "Poids utilitaire:", newVal.utilityWeight() + " kg");
-                addDetailRow(detailsGrid, 8, "Couleur:", newVal.color());
-                addDetailRow(detailsGrid, 9, "Kilométrage:", newVal.kilometers() + " km");
-                addDetailRow(detailsGrid, 10, "Date d'acquisition:",
-                    newVal.acquisitionDate() != null ?
-                    newVal.acquisitionDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) : "N/A");
-                addDetailRow(detailsGrid, 11, "Statut:", formatStatus(newVal.status().toString()));
-            }
-        });
+        setupVehicleDetailsListener(titleLabel, detailsGrid);
 
         detailsBox.getChildren().addAll(titleLabel, new Separator(), detailsGrid, reserveButton);
 
         return detailsBox;
+    }
+
+    private Button createReserveButton() {
+        Button reserveButton = new Button("Réserver ce véhicule");
+        reserveButton.setOnAction(e -> showReservationDialog());
+        reserveButton.setMaxWidth(Double.MAX_VALUE);
+        reserveButton.getStyleClass().add("vehicle-reserve-button");
+        reserveButton.disableProperty().bind(model.selectedVehicleProperty().isNull());
+        return reserveButton;
+    }
+
+    private void setupVehicleDetailsListener(Label titleLabel, GridPane detailsGrid) {
+        model.selectedVehicleProperty().addListener((obs, oldVal, newVal) -> {
+            detailsGrid.getChildren().clear();
+            if (newVal != null) {
+                titleLabel.setText(newVal.manufacturer() + " " + newVal.model());
+                populateVehicleDetailsGrid(detailsGrid, newVal);
+            }
+        });
+    }
+
+    private void populateVehicleDetailsGrid(GridPane grid, Vehicle vehicle) {
+        addDetailRow(grid, 0, "Plaque d'immatriculation:", vehicle.licencePlate());
+        addDetailRow(grid, 1, "Constructeur:", vehicle.manufacturer());
+        addDetailRow(grid, 2, "Modèle:", vehicle.model());
+        addDetailRow(grid, 3, "Énergie:", formatEnergy(vehicle.energy().toString()));
+        addDetailRow(grid, 4, "Puissance:", vehicle.power() + " CV");
+        addDetailRow(grid, 5, "Sièges:", String.valueOf(vehicle.seats()));
+        addDetailRow(grid, 6, "Capacité:", vehicle.capacity() + " L");
+        addDetailRow(grid, 7, "Poids utilitaire:", vehicle.utilityWeight() + " kg");
+        addDetailRow(grid, 8, "Couleur:", vehicle.color());
+        addDetailRow(grid, 9, "Kilométrage:", vehicle.kilometers() + " km");
+        addDetailRow(grid, 10, "Date d'acquisition:",
+            vehicle.acquisitionDate() != null ?
+            vehicle.acquisitionDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) : "N/A");
+        addDetailRow(grid, 11, "Statut:", formatStatus(vehicle.status().toString()));
     }
 
     private void addDetailRow(GridPane grid, int row, String label, String value) {
@@ -214,6 +242,27 @@ public class VehicleSelectorViewBuilder implements Builder<Region> {
         Label calendarTitle = new Label("Disponibilité du véhicule");
         calendarTitle.getStyleClass().add("calendar-title");
 
+        YearMonth[] currentMonth = {YearMonth.now()};
+
+        GridPane calendarGrid = new GridPane();
+        calendarGrid.getStyleClass().add("calendar-grid");
+
+        VBox reservationListBox = createReservationListBox();
+
+        HBox navigationBox = createCalendarNavigation(currentMonth, calendarGrid, reservationListBox);
+        HBox legendBox = createCalendarLegend();
+
+        calendarBox.getChildren().addAll(calendarTitle, navigationBox, calendarGrid, legendBox, reservationListBox);
+
+        Runnable updateCalendar = createCalendarUpdateRunnable(currentMonth, calendarGrid, reservationListBox);
+
+        setupCalendarListeners(updateCalendar);
+        updateCalendar.run();
+
+        return calendarBox;
+    }
+
+    private HBox createCalendarNavigation(YearMonth[] currentMonth, GridPane calendarGrid, VBox reservationListBox) {
         HBox navigationBox = new HBox(10);
         navigationBox.getStyleClass().add("calendar-month-navigation");
         navigationBox.setAlignment(Pos.CENTER);
@@ -227,33 +276,49 @@ public class VehicleSelectorViewBuilder implements Builder<Region> {
         Button nextMonthButton = new Button("▶");
         nextMonthButton.getStyleClass().add("calendar-nav-button");
 
+        Runnable updateCalendar = createCalendarUpdateRunnable(currentMonth, calendarGrid, reservationListBox);
+
+        prevMonthButton.setOnAction(e -> {
+            currentMonth[0] = currentMonth[0].minusMonths(1);
+            updateCalendar.run();
+        });
+
+        nextMonthButton.setOnAction(e -> {
+            currentMonth[0] = currentMonth[0].plusMonths(1);
+            updateCalendar.run();
+        });
+
         navigationBox.getChildren().addAll(prevMonthButton, monthLabel, nextMonthButton);
+        return navigationBox;
+    }
 
-        GridPane calendarGrid = new GridPane();
-        calendarGrid.getStyleClass().add("calendar-grid");
-
+    private HBox createCalendarLegend() {
         HBox legendBox = new HBox(15);
         legendBox.getStyleClass().add("calendar-legend");
         legendBox.setAlignment(Pos.CENTER);
 
-        HBox availableItem = new HBox(5);
-        availableItem.getStyleClass().add("calendar-legend-item");
-        Region availableBox = new Region();
-        availableBox.getStyleClass().addAll("calendar-legend-box", "calendar-legend-box-available");
-        Label availableLabel = new Label("Disponible");
-        availableLabel.getStyleClass().add("calendar-legend-label");
-        availableItem.getChildren().addAll(availableBox, availableLabel);
-
-        HBox reservedItem = new HBox(5);
-        reservedItem.getStyleClass().add("calendar-legend-item");
-        Region reservedBox = new Region();
-        reservedBox.getStyleClass().addAll("calendar-legend-box", "calendar-legend-box-reserved");
-        Label reservedLabel = new Label("Réservé");
-        reservedLabel.getStyleClass().add("calendar-legend-label");
-        reservedItem.getChildren().addAll(reservedBox, reservedLabel);
+        HBox availableItem = createLegendItem("Disponible", "calendar-legend-box-available");
+        HBox reservedItem = createLegendItem("Réservé", "calendar-legend-box-reserved");
 
         legendBox.getChildren().addAll(availableItem, reservedItem);
+        return legendBox;
+    }
 
+    private HBox createLegendItem(String text, String styleClass) {
+        HBox item = new HBox(5);
+        item.getStyleClass().add("calendar-legend-item");
+
+        Region box = new Region();
+        box.getStyleClass().addAll("calendar-legend-box", styleClass);
+
+        Label label = new Label(text);
+        label.getStyleClass().add("calendar-legend-label");
+
+        item.getChildren().addAll(box, label);
+        return item;
+    }
+
+    private VBox createReservationListBox() {
         VBox reservationListBox = new VBox(5);
         reservationListBox.getStyleClass().add("reservation-list-container");
 
@@ -270,99 +335,121 @@ public class VehicleSelectorViewBuilder implements Builder<Region> {
         VBox.setVgrow(reservationScrollPane, Priority.ALWAYS);
         reservationListBox.getChildren().addAll(reservationListTitle, reservationScrollPane);
 
-        calendarBox.getChildren().addAll(calendarTitle, navigationBox, calendarGrid, legendBox, reservationListBox);
+        return reservationListBox;
+    }
 
-        YearMonth[] currentMonth = {YearMonth.now()};
+    private Runnable createCalendarUpdateRunnable(YearMonth[] currentMonth, GridPane calendarGrid, VBox reservationListBox) {
+        return () -> {
+            Label monthLabel = (Label) ((HBox) calendarGrid.getParent().getChildrenUnmodifiable()
+                .filtered(node -> node instanceof HBox && node.getStyleClass().contains("calendar-month-navigation"))
+                .getFirst()).getChildren().get(1);
 
-        Runnable updateCalendar = () -> {
-            calendarGrid.getChildren().clear();
-
-            monthLabel.setText(currentMonth[0].getMonth().getDisplayName(TextStyle.FULL, Locale.FRENCH) + " " + currentMonth[0].getYear());
-
-            String[] dayHeaders = {"Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"};
-            for (int i = 0; i < 7; i++) {
-                Label dayHeader = new Label(dayHeaders[i]);
-                dayHeader.getStyleClass().add("calendar-day-header");
-                calendarGrid.add(dayHeader, i, 0);
-            }
-
-            LocalDate firstOfMonth = currentMonth[0].atDay(1);
-            int daysInMonth = currentMonth[0].lengthOfMonth();
-            int dayOfWeek = firstOfMonth.getDayOfWeek().getValue();
-
-            int row = 1;
-            int col = dayOfWeek - 1;
-
-            for (int day = 1; day <= daysInMonth; day++) {
-                LocalDate date = currentMonth[0].atDay(day);
-                Label dayLabel = new Label(String.valueOf(day));
-                dayLabel.getStyleClass().add("calendar-day-cell");
-
-                boolean isReserved = model.selectedVehicleReservationsProperty().stream()
-                    .anyMatch(reservation -> {
-                        LocalDate resStart = reservation.startDate().toLocalDate();
-                        LocalDate resEnd = reservation.endDate().toLocalDate();
-                        return !date.isBefore(resStart) && !date.isAfter(resEnd);
-                    });
-
-                if (isReserved) {
-                    dayLabel.getStyleClass().add("calendar-day-reserved");
-                } else {
-                    dayLabel.getStyleClass().add("calendar-day-available");
-                }
-
-                if (date.equals(LocalDate.now())) {
-                    dayLabel.getStyleClass().add("calendar-day-today");
-                }
-
-                calendarGrid.add(dayLabel, col, row);
-
-                col++;
-                if (col > 6) {
-                    col = 0;
-                    row++;
-                }
-            }
-
-            reservationItemsBox.getChildren().clear();
-            if (model.selectedVehicleReservationsProperty().isEmpty()) {
-                Label noReservations = new Label("Aucune réservation");
-                noReservations.setStyle("-fx-text-fill: -fx-text-secondary; -fx-font-style: italic;");
-                reservationItemsBox.getChildren().add(noReservations);
-            } else {
-                for (Reservation reservation : model.selectedVehicleReservationsProperty()) {
-                    VBox reservationItem = new VBox(3);
-                    reservationItem.getStyleClass().add("reservation-item");
-
-                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-                    Label dateLabel = new Label("Du " + reservation.startDate().format(formatter) + " au " + reservation.endDate().format(formatter));
-                    dateLabel.getStyleClass().add("reservation-item-date");
-
-                    Label statusLabel = new Label("Statut: " + formatReservationStatus(reservation.status().toString()));
-                    statusLabel.getStyleClass().add("reservation-item-status");
-                    statusLabel.getStyleClass().add("reservation-status-" + reservation.status().toString().toLowerCase());
-
-                    reservationItem.getChildren().addAll(dateLabel, statusLabel);
-                    reservationItemsBox.getChildren().add(reservationItem);
-                }
-            }
+            updateCalendarGrid(currentMonth[0], calendarGrid, monthLabel);
+            updateReservationList(reservationListBox);
         };
+    }
 
-        prevMonthButton.setOnAction(e -> {
-            currentMonth[0] = currentMonth[0].minusMonths(1);
-            updateCalendar.run();
-        });
+    private void updateCalendarGrid(YearMonth month, GridPane calendarGrid, Label monthLabel) {
+        calendarGrid.getChildren().clear();
 
-        nextMonthButton.setOnAction(e -> {
-            currentMonth[0] = currentMonth[0].plusMonths(1);
-            updateCalendar.run();
-        });
+        monthLabel.setText(month.getMonth().getDisplayName(TextStyle.FULL, Locale.FRENCH) + " " + month.getYear());
 
+        addCalendarDayHeaders(calendarGrid);
+        populateCalendarDays(month, calendarGrid);
+    }
+
+    private void addCalendarDayHeaders(GridPane calendarGrid) {
+        String[] dayHeaders = {"Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"};
+        for (int i = 0; i < 7; i++) {
+            Label dayHeader = new Label(dayHeaders[i]);
+            dayHeader.getStyleClass().add("calendar-day-header");
+            calendarGrid.add(dayHeader, i, 0);
+        }
+    }
+
+    private void populateCalendarDays(YearMonth month, GridPane calendarGrid) {
+        LocalDate firstOfMonth = month.atDay(1);
+        int daysInMonth = month.lengthOfMonth();
+        int dayOfWeek = firstOfMonth.getDayOfWeek().getValue();
+
+        int row = 1;
+        int col = dayOfWeek - 1;
+
+        for (int day = 1; day <= daysInMonth; day++) {
+            LocalDate date = month.atDay(day);
+            Label dayLabel = createCalendarDayLabel(day, date);
+
+            calendarGrid.add(dayLabel, col, row);
+
+            col++;
+            if (col > 6) {
+                col = 0;
+                row++;
+            }
+        }
+    }
+
+    private Label createCalendarDayLabel(int day, LocalDate date) {
+        Label dayLabel = new Label(String.valueOf(day));
+        dayLabel.getStyleClass().add("calendar-day-cell");
+
+        boolean isReserved = model.selectedVehicleReservationsProperty().stream()
+            .anyMatch(reservation -> {
+                LocalDate resStart = reservation.startDate().toLocalDate();
+                LocalDate resEnd = reservation.endDate().toLocalDate();
+                return !date.isBefore(resStart) && !date.isAfter(resEnd);
+            });
+
+        if (isReserved) {
+            dayLabel.getStyleClass().add("calendar-day-reserved");
+        } else {
+            dayLabel.getStyleClass().add("calendar-day-available");
+        }
+
+        if (date.equals(LocalDate.now())) {
+            dayLabel.getStyleClass().add("calendar-day-today");
+        }
+
+        return dayLabel;
+    }
+
+    private void updateReservationList(VBox reservationListBox) {
+        ScrollPane scrollPane = (ScrollPane) reservationListBox.getChildren().get(1);
+        VBox reservationItemsBox = (VBox) scrollPane.getContent();
+
+        reservationItemsBox.getChildren().clear();
+
+        if (model.selectedVehicleReservationsProperty().isEmpty()) {
+            Label noReservations = new Label("Aucune réservation");
+            noReservations.setStyle("-fx-text-fill: -fx-text-secondary; -fx-font-style: italic;");
+            reservationItemsBox.getChildren().add(noReservations);
+        } else {
+            for (Reservation reservation : model.selectedVehicleReservationsProperty()) {
+                VBox reservationItem = createReservationItem(reservation);
+                reservationItemsBox.getChildren().add(reservationItem);
+            }
+        }
+    }
+
+    private VBox createReservationItem(Reservation reservation) {
+        VBox reservationItem = new VBox(3);
+        reservationItem.getStyleClass().add("reservation-item");
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+        Label dateLabel = new Label("Du " + reservation.startDate().format(formatter) +
+            " au " + reservation.endDate().format(formatter));
+        dateLabel.getStyleClass().add("reservation-item-date");
+
+        Label statusLabel = new Label("Statut: " + formatReservationStatus(reservation.status().toString()));
+        statusLabel.getStyleClass().add("reservation-item-status");
+        statusLabel.getStyleClass().add("reservation-status-" + reservation.status().toString().toLowerCase());
+
+        reservationItem.getChildren().addAll(dateLabel, statusLabel);
+        return reservationItem;
+    }
+
+    private void setupCalendarListeners(Runnable updateCalendar) {
         model.selectedVehicleReservationsProperty().addListener((obs, oldVal, newVal) -> updateCalendar.run());
-
-        updateCalendar.run();
-
-        return calendarBox;
     }
 
     private String formatReservationStatus(String status) {
@@ -382,6 +469,20 @@ public class VehicleSelectorViewBuilder implements Builder<Region> {
 
         StyleApplier.applyStylesheets(dialog);
 
+        GridPane grid = createReservationDialogGrid();
+        dialog.getDialogPane().setContent(grid);
+
+        ButtonType reserveButtonType = new ButtonType("Réserver", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(reserveButtonType, ButtonType.CANCEL);
+
+        dialog.showAndWait().ifPresent(response -> {
+            if (response == reserveButtonType) {
+                handleReservationSubmit(grid);
+            }
+        });
+    }
+
+    private GridPane createReservationDialogGrid() {
         GridPane grid = new GridPane();
         grid.setHgap(10);
         grid.setVgap(10);
@@ -418,36 +519,40 @@ public class VehicleSelectorViewBuilder implements Builder<Region> {
 
         grid.add(errorLabel, 0, 5, 2, 1);
 
-        dialog.getDialogPane().setContent(grid);
+        return grid;
+    }
 
-        ButtonType reserveButtonType = new ButtonType("Réserver", ButtonBar.ButtonData.OK_DONE);
-        dialog.getDialogPane().getButtonTypes().addAll(reserveButtonType, ButtonType.CANCEL);
+    private void handleReservationSubmit(GridPane grid) {
+        try {
+            DatePicker startDatePicker = (DatePicker) grid.getChildren().get(1);
+            TextField startTimeField = (TextField) grid.getChildren().get(3);
+            DatePicker endDatePicker = (DatePicker) grid.getChildren().get(6);
+            TextField endTimeField = (TextField) grid.getChildren().get(8);
 
-        dialog.showAndWait().ifPresent(response -> {
-            if (response == reserveButtonType) {
-                try {
-                    LocalDate startDate = startDatePicker.getValue();
-                    LocalTime startTime = LocalTime.parse(startTimeField.getText());
-                    LocalDateTime startDateTime = LocalDateTime.of(startDate, startTime);
+            LocalDate startDate = startDatePicker.getValue();
+            LocalTime startTime = LocalTime.parse(startTimeField.getText());
+            LocalDateTime startDateTime = LocalDateTime.of(startDate, startTime);
 
-                    LocalDate endDate = endDatePicker.getValue();
-                    LocalTime endTime = LocalTime.parse(endTimeField.getText());
-                    LocalDateTime endDateTime = LocalDateTime.of(endDate, endTime);
+            LocalDate endDate = endDatePicker.getValue();
+            LocalTime endTime = LocalTime.parse(endTimeField.getText());
+            LocalDateTime endDateTime = LocalDateTime.of(endDate, endTime);
 
-                    model.setReservationStartDate(startDateTime);
-                    model.setReservationEndDate(endDateTime);
+            model.setReservationStartDate(startDateTime);
+            model.setReservationEndDate(endDateTime);
 
-                    reserveVehicleAction.run();
-                } catch (Exception e) {
-                    Alert alert = new Alert(Alert.AlertType.ERROR);
-                    StyleApplier.applyStylesheets(alert);
-                    alert.setTitle("Erreur");
-                    alert.setHeaderText(null);
-                    alert.setContentText("Format de date/heure invalide. Utilisez HH:mm pour l'heure (ex: 09:00)");
-                    alert.showAndWait();
-                }
-            }
-        });
+            reserveVehicleAction.run();
+        } catch (Exception e) {
+            showErrorAlert("Format de date/heure invalide. Utilisez HH:mm pour l'heure (ex: 09:00)");
+        }
+    }
+
+    private void showErrorAlert(String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        StyleApplier.applyStylesheets(alert);
+        alert.setTitle("Erreur");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 
     private static class VehicleListCell extends ListCell<Vehicle> {

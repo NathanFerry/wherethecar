@@ -7,12 +7,12 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ReservationDao {
-    public ReservationDto getReservationById(UUID uuid);
-    public List<ReservationDto> getAllReservations();
-    public List<ReservationDto> getActiveReservationsByAgentUuid(UUID agentUuid);
-    public List<ReservationDto> getHistoricalReservationsByAgentUuid(UUID agentUuid);
-    public List<ReservationDto> getReservationsByVehicleUuid(UUID vehicleUuid);
-    public boolean hasOverlappingReservation(UUID vehicleUuid, LocalDateTime startDate, LocalDateTime endDate);
-    public void createReservation(UUID uuid, UUID agentUuid, UUID vehicleUuid, LocalDateTime startDate, LocalDateTime endDate, String status);
-    public void updateReservationStatus(UUID reservationUuid, String status);
+    ReservationDto getReservationById(UUID uuid);
+    List<ReservationDto> getAllReservations();
+    List<ReservationDto> getActiveReservationsByAgentUuid(UUID agentUuid);
+    List<ReservationDto> getHistoricalReservationsByAgentUuid(UUID agentUuid);
+    List<ReservationDto> getReservationsByVehicleUuid(UUID vehicleUuid);
+    boolean hasOverlappingReservation(UUID vehicleUuid, LocalDateTime startDate, LocalDateTime endDate);
+    void createReservation(UUID uuid, UUID agentUuid, UUID vehicleUuid, LocalDateTime startDate, LocalDateTime endDate, String status);
+    void updateReservationStatus(UUID reservationUuid, String status);
 }

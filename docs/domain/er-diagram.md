@@ -4,9 +4,7 @@ title: Entity-Relationship Diagram for Vehicle Management System
 ---
 erDiagram
     VEHICLE ||--o{ MAINTENANCE_OPERATION : has
-    VEHICLE ||--o{ PICTURE : has
     VEHICLE ||--o{ RESERVATION : "is reserved by"
-    MAINTENANCE_OPERATION ||--o{ MAINTENANCE_DOCUMENT : has
     AGENT ||--o{ RESERVATION : makes
     
     VEHICLE {
@@ -25,13 +23,6 @@ erDiagram
         enum status "available, reserved, maintenance"
     }
     
-    PICTURE {
-        uuid uuid PK
-        uuid vehicleUuid FK
-        string name
-        string filePath
-    }
-    
     MAINTENANCE_OPERATION {
         uuid uuid PK
         vehicle vehicle FK
@@ -39,13 +30,6 @@ erDiagram
         string description
         datetime date
         decimal cost
-    }
-    
-    MAINTENANCE_DOCUMENT {
-        uuid uuid PK
-        uuid operationUuid FK
-        string name
-        string filePath
     }
     
     AGENT {

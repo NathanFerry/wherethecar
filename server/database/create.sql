@@ -52,8 +52,6 @@ create table if not exists reservation (
     status reservation_status not null
 );
 
--- This part is still work in progress. It will not be hydrated yet.
-
 create table if not exists maintenance_operation (
     uuid uuid primary key,
     vehicle_uuid uuid references vehicle(uuid) on delete cascade,
@@ -62,6 +60,8 @@ create table if not exists maintenance_operation (
     operation_date timestamp not null,
     cost numeric(10, 2) not null
 );
+
+-- This part is still work in progress. It will not be hydrated yet.
 
 create table if not exists maintenance_document (
     uuid uuid primary key,
